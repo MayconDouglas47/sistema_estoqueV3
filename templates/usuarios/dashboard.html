@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% load access_tags %}
+{% block content %}
+<div class="container-fluid p-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="h3">Dashboard</h1>
+        </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-left-primary">
+                <div class="card-body">
+                    <h5 class="card-title">Total de Produtos</h5>
+                    <h2 class="card-text text-primary">{{ total_produtos }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-left-danger">
+                <div class="card-body">
+                    <h5 class="card-title">Produtos Zerados</h5>
+                    <h2 class="card-text text-danger">{{ produtos_zerados }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-left-info">
+                <div class="card-body">
+                    <h5 class="card-title">Valor Total Estoque</h5>
+                    <h4 class="card-text text-info">R$ {{ valor_total_estoque|floatformat:2 }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-left-success">
+                <div class="card-body">
+                    <h5 class="card-title">Movimentações</h5>
+                    <p class="card-text"><small>Entradas: {{ total_entradas }} | Saídas: {{ total_saidas }}</small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alertas -->
+    {% if estoque_baixo %}
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class='bx bx-warning'></i> Alertas de Estoque Baixo</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Produto</th>
+                                <th>Categoria</th>
+                                <th>Estoque Atual</th>
+                                <th>Mínimo</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for produto in estoque_baixo %}
+                            <tr class="table-danger">
+                                <td>{{ produto.nome }}</td>
+                                <td>{{ produto.categoria.nome }}</td>
+                                <td><strong>{{ produto.estoque_atual }}</strong></td>
+                                <td>{{ produto.estoque_minimo }}</td>
+                                <td>
+                                    <a href="{% url 'produtos:editar' produto.id %}" class="btn btn-sm btn-warning">Editar</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Top Categorias -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Categorias com Mais Produtos</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for cat in categorias_top %}
+                        <div class="col-md-4 mb-3">
+                            <div class="alert alert-info">
+                                <strong>{{ cat.categoria__nome }}</strong><br>
+                                <span class="badge bg-primary">{{ cat.count }} produto{{ cat.count|pluralize }}</span>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="col-md-12">
+                            <p class="text-muted">Nenhum produto cadastrado ainda.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Links (visíveis apenas para Admin/Estoquista) -->
+    {% has_access "admin,estoquista" as can_manage %}
+    {% if can_manage %}
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <h5>Atalhos Rápidos</h5>
+            <div class="btn-group" role="group">
+                {% has_access "admin,estoquista" as can_products %}
+                {% if can_products %}
+                <a href="{% url 'produtos:criar' %}" class="btn btn-primary"><i class='bx bx-plus'></i> Novo Produto</a>
+                <a href="{% url 'produtos:index' %}" class="btn btn-secondary"><i class='bx bx-list-ul'></i> Ver Produtos</a>
+                {% endif %}
+
+                {% has_access "admin,estoquista" as can_movements %}
+                {% if can_movements %}
+                <a href="{% url 'movimentacoes:criar_entrada' %}" class="btn btn-success"><i class='bx bx-down-arrow'></i> Nova Entrada</a>
+                <a href="{% url 'movimentacoes:criar_saida' %}" class="btn btn-danger"><i class='bx bx-up-arrow'></i> Nova Saída</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.border-left-primary { border-left: 4px solid #007bff; }
+.border-left-danger { border-left: 4px solid #dc3545; }
+.border-left-info { border-left: 4px solid #17a2b8; }
+.border-left-success { border-left: 4px solid #28a745; }
+</style>
+{% endblock %}

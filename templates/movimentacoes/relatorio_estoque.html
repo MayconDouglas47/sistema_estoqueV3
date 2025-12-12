@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Relatório de Estoque{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-4">
+    <div class="row mb-3">
+        <div class="col-md-8"><h1 class="h3">Relatório de Estoque</h1></div>
+        <div class="col-md-4 text-end"><strong>Valor total do estoque: R$ {{ valor_geral|floatformat:2 }}</strong></div>
+    </div>
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-striped mb-0">
+                <thead>
+                    <tr>
+                        <th>Produto</th>
+                        <th>Categoria</th>
+                        <th>Marca</th>
+                        <th>Fornecedor</th>
+                        <th>Estoque</th>
+                        <th>Preço Custo</th>
+                        <th>Valor Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in produtos %}
+                    <tr>
+                        <td>{{ p.nome }}</td>
+                        <td>{{ p.categoria.nome }}</td>
+                        <td>{{ p.marca.nome }}</td>
+                        <td>{{ p.fornecedor.nome }}</td>
+                        <td>{{ p.estoque_atual }}</td>
+                        <td>R$ {{ p.preco_custo|floatformat:2 }}</td>
+                        <td>R$ {{ p.valor_total|floatformat:2 }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" class="text-center text-muted">Nenhum produto cadastrado.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

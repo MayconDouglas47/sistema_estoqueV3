@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Movimentações{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-4">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h1 class="h3 mb-0">Movimentações</h1>
+        </div>
+        <div class="col-md-6 text-end">
+            <a href="{% url 'movimentacoes:criar_entrada' %}" class="btn btn-success me-2">Nova Entrada</a>
+            <a href="{% url 'movimentacoes:criar_saida' %}" class="btn btn-danger">Nova Saída</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <h5>Entradas Recentes</h5>
+            <div class="card mb-4">
+                <ul class="list-group list-group-flush">
+                    {% for e in entradas %}
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <div>
+                                <a href="{% url 'movimentacoes:detalhe_entrada' e.id %}" class="fw-bold text-decoration-none">Entrada #{{ e.id }}</a>
+                                <small class="d-block">{{ e.data_entrada }}</small>
+                                <small class="d-block text-muted">Fornecedor: {{ e.fornecedor.nome|default:"-" }}</small>
+                            </div>
+                            <div>
+                                <a href="{% url 'movimentacoes:deletar_entrada' e.id %}" class="btn btn-sm btn-danger">Deletar</a>
+                            </div>
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item text-center text-muted">Nenhuma entrada</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <h5>Saídas Recentes</h5>
+            <div class="card mb-4">
+                <ul class="list-group list-group-flush">
+                    {% for s in saidas %}
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <div>
+                                <a href="{% url 'movimentacoes:detalhe_saida' s.id %}" class="fw-bold text-decoration-none">Saída #{{ s.id }} — {{ s.get_tipo_saida_display }}</a>
+                                <small class="d-block">{{ s.data_saida }}</small>
+                            </div>
+                            <div>
+                                <a href="{% url 'movimentacoes:deletar_saida' s.id %}" class="btn btn-sm btn-danger">Deletar</a>
+                            </div>
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item text-center text-muted">Nenhuma saída</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

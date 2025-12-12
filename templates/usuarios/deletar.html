@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Deletar Usuário{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-4">
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <h1 class="h3">Deletar Usuário</h1>
+        </div>
+    </div>
+
+    <div class="alert alert-warning" role="alert">
+        <strong>Atenção!</strong> Você está prestes a deletar o usuário <strong>{{ usuario.nome }}</strong>. Esta ação não pode ser desfeita.
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <p><strong>Nome:</strong> {{ usuario.nome }}</p>
+            <p><strong>Login:</strong> {{ usuario.login }}</p>
+            <p><strong>Role:</strong> {{ usuario.get_nivel_acesso_display }}</p>
+
+            <form method="POST" class="mt-4">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Confirmar Deleção</button>
+                <a href="{% url 'usuarios:index' %}" class="btn btn-secondary">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

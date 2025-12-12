@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Deletar Marca{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-4">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">Deletar Marca</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-4">
+                        Tem certeza que deseja deletar a marca <strong>{{ object.nome }}</strong>?
+                    </p>
+                    <p class="text-muted small">
+                        Esta ação não pode ser desfeita.
+                    </p>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2 d-sm-flex justify-content-sm-end">
+                            <a href="{% url 'marcas:index' %}" class="btn btn-secondary">
+                                Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                Sim, Deletar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,32 @@
+
+<header class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+<div class="container-fluid">
+<div class="d-flex align-items-center">
+	<a class="navbar-brand" href="#">Painel</a>
+</div>
+
+
+<div class="d-flex align-items-center">
+<div class="dropdown">
+<a class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle" href="#" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+	<strong>
+		{% if request.user.is_authenticated %}
+			{{ request.user.nome }} {% if request.user.get_nivel_acesso_display %}({{ request.user.get_nivel_acesso_display }}){% endif %}
+		{% else %}
+			Usuário
+		{% endif %}
+	</strong>
+</a>
+<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+	<li><a class="dropdown-item" href="{% url 'usuarios:profile' %}">Perfil</a></li>
+	<li>
+		<form method="POST" action="{% url 'logout' %}" style="margin: 0;">
+			{% csrf_token %}
+			<button type="submit" class="dropdown-item" style="background: none; border: none; cursor: pointer; text-align: left; width: 100%; padding: 0.5rem 1rem;">Sair</button>
+		</form>
+	</li>
+</ul>
+</div>
+</div>
+</div>
+</header>

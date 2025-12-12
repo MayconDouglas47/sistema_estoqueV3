@@ -1,0 +1,81 @@
+/* Estilos base adaptados do CodePen */
+body{
+font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+background-color: #f8f9fa;
+}
+
+
+/* Sidebar */
+#sidebar .sidebar-header{border-bottom:1px solid rgba(255,255,255,0.05)}
+#sidebar .nav-link{padding: .5rem 1rem}
+#sidebar .nav-link:hover{background: rgba(255,255,255,0.03)}
+#sidebar .nav-link i{vertical-align:middle}
+
+
+/* Content */
+#content-wrapper{min-height:100vh; display:flex; flex-direction:column}
+
+
+/* Small spacing helpers */
+.sidebar-menu .nav .nav-link{font-size: .95rem}
+
+
+/* Active link style */
+.nav-link.active{background: rgba(255,255,255,0.06); border-radius:4px}
+
+/* Regras específicas do sidebar movidas de templates/includes/sidebar.html */
+#sidebar{
+	width: 250px;
+	min-height: 100vh;
+	position: fixed;
+	top: 0;
+	left: 0;
+	transition: all .3s;
+	z-index: 1000;
+}
+#content-wrapper{
+	margin-left: 250px;
+	transition: all .3s;
+}
+
+/* Sidebar is fixed and always visible; remove collapsed states */
+#sidebar{width:250px}
+#content-wrapper{margin-left:250px}
+
+/* Ensure sidebar headings and labels are visible on dark background */
+.sidebar-menu .nav-link{color:rgba(255,255,255,0.95)}
+.sidebar-menu .nav-link .nav-label{color:rgba(255,255,255,0.95)}
+/* Section titles (clear visible headings) */
+.sidebar-menu .section-title{color:#d1e0ff !important; font-weight:600; font-size:0.85rem; letter-spacing:0.02em}
+.sidebar-menu .section-title i{margin-right:.35rem}
+
+/* Small screens */
+@media (max-width: 767px){
+	#sidebar{position: fixed; left: -260px; width: 260px}
+	#sidebar.show-mobile{left:0}
+	#content-wrapper{margin-left:0}
+	/* When mobile overlay is visible, dim the page */
+	body.mobile-sidebar-open::before{
+		content: '';
+		position: fixed;
+		inset: 0;
+		background: rgba(0,0,0,0.35);
+		z-index: 900;
+	}
+}
+
+/* Header adjustments to avoid overlap */
+header.navbar .navbar-brand{font-weight:600}
+@media (min-width: 768px){
+	header.navbar{padding-left: 1.25rem; padding-right:1.25rem}
+}
+
+/* Smooth interactions */
+#sidebar, #content-wrapper, .nav-link{transition: all .18s ease-in-out}
+
+/* Visual polish */
+#sidebar{background: linear-gradient(180deg,#1f2937,#111827); color:#fff}
+#sidebar .nav-link{color:rgba(255,255,255,0.92)}
+#sidebar .nav-link:hover{background: rgba(255,255,255,0.04)}
+#sidebar .nav-link i{font-size:1.1rem}
+#sidebar .nav-label{font-size:0.95rem}

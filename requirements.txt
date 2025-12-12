@@ -1,0 +1,5 @@
+Django==6.0
+Pillow>=9.0.0
+django-crispy-forms>=2.0
+crispy-bootstrap5>=0.6
+# use `pip install -r requirements.txt` to install dependencies

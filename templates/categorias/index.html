@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Categorias{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3">Categorias</h1>
+    <a href="{% url 'categorias:criar' %}" class="btn btn-primary">
+        <i class='bx bx-plus'></i> Nova Categoria
+    </a>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+
+{% if categorias %}
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Descrição</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for categoria in categorias %}
+                    <tr>
+                        <td><small class="text-muted">{{ categoria.id }}</small></td>
+                        <td><strong>{{ categoria.nome }}</strong></td>
+                        <td>
+                            {% if categoria.descricao %}
+                                {{ categoria.descricao|truncatewords:10 }}
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'categorias:editar' categoria.id %}" class="btn btn-sm btn-warning">
+                                <i class='bx bx-edit'></i>
+                            </a>
+                            <a href="{% url 'categorias:deletar' categoria.id %}" class="btn btn-sm btn-danger">
+                                <i class='bx bx-trash'></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="alert alert-info text-center">
+        <p class="mb-0">Nenhuma categoria cadastrada. <a href="{% url 'categorias:criar' %}">Clique aqui para criar uma</a></p>
+    </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,65 @@
+
+<nav class="navbar navbar-dark bg-dark">
+	<div class="sidebar-menu">
+		<ul class="nav flex-column">
+			<li class="nav-item">
+				<span class="nav-link text-white fw-bold">
+					<i class='bx bx-grid-alt me-2'></i> Sistema de Estoque
+				</span>
+			</li>
+
+			<li class="nav-item mt-2">
+				<a class="nav-link text-white d-flex align-items-center" href="{% url 'usuarios:dashboard' %}"><i class='bx bx-home-alt'></i><span class="nav-label ms-2">Dashboard</span></a>
+			</li>
+
+
+			<li class="nav-item mt-2">
+				<div class="nav-link section-title px-3">Cadastro</div>
+				<ul class="nav flex-column ms-2">
+					{% load access_tags %}
+					{% has_access "admin" as can_manage_users %}
+					{% if can_manage_users %}
+					<li class="nav-item"><a class="nav-link text-white d-flex align-items-center" href="{% url 'usuarios:index' %}"><i class='bx bx-user'></i><span class="nav-label ms-2">Usuários</span></a></li>
+					{% endif %}
+					{% has_access "admin,estoquista" as can_view_catalogs %}
+					{% if can_view_catalogs %}
+					<li class="nav-item"><a class="nav-link text-white d-flex align-items-center" href="{% url 'categorias:index' %}"><i class='bx bx-category'></i><span class="nav-label ms-2">Categorias</span></a></li>
+					<li class="nav-item"><a class="nav-link text-white d-flex align-items-center" href="{% url 'marcas:index' %}"><i class='bx bx-label'></i><span class="nav-label ms-2">Marcas</span></a></li>
+					<li class="nav-item"><a class="nav-link text-white d-flex align-items-center" href="{% url 'fornecedores:index' %}"><i class='bx bx-building-house'></i><span class="nav-label ms-2">Fornecedores</span></a></li>
+					{% endif %}
+				</ul>
+			</li>
+
+
+			<li class="nav-item mt-3">
+				<div class="nav-link section-title px-3">Estoque</div>
+				<ul class="nav flex-column ms-2">
+					{% has_access "admin,estoquista" as can_manage_products %}
+					{% if can_manage_products %}
+					<li class="nav-item"><a class="nav-link text-white d-flex align-items-center" href="{% url 'produtos:index' %}"><i class='bx bx-box'></i><span class="nav-label ms-2">Produtos</span></a></li>
+					{% endif %}
+					{% has_access "admin,estoquista" as can_manage_movements %}
+					{% if can_manage_movements %}
+					<li class="nav-item"><a class="nav-link text-white d-flex align-items-center" href="{% url 'movimentacoes:entradas' %}"><i class='bx bx-import'></i><span class="nav-label ms-2">Entradas</span></a></li>
+					<li class="nav-item"><a class="nav-link text-white d-flex align-items-center" href="{% url 'movimentacoes:saidas' %}"><i class='bx bx-export'></i><span class="nav-label ms-2">Saídas</span></a></li>
+					{% endif %}
+				</ul>
+			</li>
+
+
+			<li class="nav-item mt-3">
+				<div class="nav-link section-title px-3">Relatórios</div>
+				<ul class="nav flex-column ms-2">
+					{% has_access "admin,estoquista" as can_view_reports %}
+					{% if can_view_reports %}
+					<li class="nav-item"><a class="nav-link text-white d-flex align-items-center" href="{% url 'movimentacoes:stock_report' %}"><i class='bx bx-file-blank'></i><span class="nav-label ms-2">Relatório de estoque</span></a></li>
+					<li class="nav-item"><a class="nav-link text-white d-flex align-items-center" href="{% url 'movimentacoes:history' %}"><i class='bx bx-history'></i><span class="nav-label ms-2">Histórico de movimentações</span></a></li>
+					{% endif %}
+				</ul>
+			</li>
+
+		</ul>
+	</div>
+</nav>
+
+<!-- CSS do sidebar foi movido para static/css/style.css -->

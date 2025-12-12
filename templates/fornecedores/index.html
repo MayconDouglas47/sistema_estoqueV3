@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Fornecedores{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-4">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h1 class="h3 mb-0">Fornecedores</h1>
+        </div>
+        <div class="col-md-6 text-end">
+            <a href="{% url 'fornecedores:criar' %}" class="btn btn-primary">
+                <i class='bx bx-plus'></i> Novo Fornecedor
+            </a>
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>CNPJ</th>
+                        <th>Email</th>
+                        <th>Telefone</th>
+                        <th style="width: 200px;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fornecedor in fornecedores %}
+                    <tr>
+                        <td>{{ fornecedor.id }}</td>
+                        <td>{{ fornecedor.nome }}</td>
+                        <td>{{ fornecedor.cnpj|default:"-" }}</td>
+                        <td>{{ fornecedor.email|default:"-" }}</td>
+                        <td>{{ fornecedor.telefone|default:"-" }}</td>
+                        <td>
+                            <a href="{% url 'fornecedores:editar' fornecedor.id %}" class="btn btn-sm btn-warning">
+                                <i class='bx bx-edit'></i> Editar
+                            </a>
+                            <a href="{% url 'fornecedores:deletar' fornecedor.id %}" class="btn btn-sm btn-danger">
+                                <i class='bx bx-trash'></i> Deletar
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">
+                            Nenhum fornecedor cadastrado
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

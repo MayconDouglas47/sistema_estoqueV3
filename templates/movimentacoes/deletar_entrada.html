@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Deletar Entrada{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-4">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white"><h5 class="mb-0">Deletar Entrada</h5></div>
+                <div class="card-body">
+                    <p>Tem certeza que deseja deletar a entrada <strong>#{{ entrada.id }}</strong>?</p>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2 d-sm-flex justify-content-sm-end">
+                            <a href="{% url 'movimentacoes:index' %}" class="btn btn-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-danger">Sim, Deletar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
