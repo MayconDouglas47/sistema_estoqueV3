@@ -17,28 +17,20 @@ Como rodar (Windows):
 
 1. Criar e ativar virtualenv
 
-```powershell
 python -m venv venv
-venv\Scripts\Activate.ps1
-```
+.\venv\Scripts\Activate
 
 2. Instalar dependências
 
-```powershell
 pip install -r requirements.txt
-```
 
 3. Aplicar migrations
 
-```powershell
-venv\Scripts\python.exe manage.py migrate
-```
+python manage.py migrate
 
 4. Rodar servidor
 
-```powershell
-venv\Scripts\python.exe manage.py runserver 127.0.0.1:8001
-```
+python manage.py runserver
 
 5. Acessar http://127.0.0.1:8001/ e logar com o usuário de teste.
 

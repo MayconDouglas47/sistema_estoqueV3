@@ -22,7 +22,7 @@ def criar(request):
             return redirect('produtos:index')
     else:
         form = ProdutoForm()
-    return render(request, 'produtos/criar.html', {'form': form})
+    return render(request, 'produtos/criar_produto.html', {'form': form})
 
 
 @login_required
@@ -36,7 +36,7 @@ def editar(request, pk):
             return redirect('produtos:index')
     else:
         form = ProdutoForm(instance=produto)
-    return render(request, 'produtos/editar.html', {'form': form, 'produto': produto})
+    return render(request, 'produtos/editar_produto.html', {'form': form, 'produto': produto})
 
 
 @login_required
@@ -46,4 +46,4 @@ def deletar(request, pk):
         produto.delete()
         messages.success(request, 'Produto deletado com sucesso!')
         return redirect('produtos:index')
-    return render(request, 'produtos/deletar.html', {'produto': produto})
+    return render(request, 'produtos/deletar_produto.html', {'produto': produto})

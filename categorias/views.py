@@ -21,7 +21,7 @@ def criar(request):
             return redirect('categorias:index')
     else:
         form = CategoriaForm()
-    return render(request, 'categorias/criar.html', {'form': form})
+    return render(request, 'categorias/criar_categoria.html', {'form': form})
 
 
 @login_required
@@ -35,7 +35,7 @@ def editar(request, pk):
             return redirect('categorias:index')
     else:
         form = CategoriaForm(instance=categoria)
-    return render(request, 'categorias/editar.html', {'form': form, 'categoria': categoria})
+    return render(request, 'categorias/editar_categoria.html', {'form': form, 'categoria': categoria})
 
 
 @login_required
@@ -45,4 +45,4 @@ def deletar(request, pk):
         categoria.delete()
         messages.success(request, 'Categoria deletada com sucesso!')
         return redirect('categorias:index')
-    return render(request, 'categorias/deletar.html', {'categoria': categoria})
+    return render(request, 'categorias/deletar_categoria.html', {'categoria': categoria})

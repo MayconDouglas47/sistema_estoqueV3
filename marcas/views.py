@@ -21,7 +21,7 @@ def criar(request):
             return redirect('marcas:index')
     else:
         form = MarcaForm()
-    return render(request, 'marcas/criar.html', {'form': form})
+    return render(request, 'marcas/criar_marca.html', {'form': form})
 
 
 @login_required
@@ -35,7 +35,7 @@ def editar(request, pk):
             return redirect('marcas:index')
     else:
         form = MarcaForm(instance=marca)
-    return render(request, 'marcas/editar.html', {'form': form, 'marca': marca})
+    return render(request, 'marcas/editar_marca.html', {'form': form, 'marca': marca})
 
 
 @login_required
@@ -45,4 +45,4 @@ def deletar(request, pk):
         marca.delete()
         messages.success(request, 'Marca deletada com sucesso!')
         return redirect('marcas:index')
-    return render(request, 'marcas/deletar.html', {'marca': marca})
+    return render(request, 'marcas/deletar_marca.html', {'marca': marca})

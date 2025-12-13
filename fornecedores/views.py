@@ -21,7 +21,7 @@ def criar(request):
             return redirect('fornecedores:index')
     else:
         form = FornecedorForm()
-    return render(request, 'fornecedores/criar.html', {'form': form})
+    return render(request, 'fornecedores/criar_fornecedor.html', {'form': form})
 
 
 @login_required
@@ -35,7 +35,7 @@ def editar(request, pk):
             return redirect('fornecedores:index')
     else:
         form = FornecedorForm(instance=fornecedor)
-    return render(request, 'fornecedores/editar.html', {'form': form, 'fornecedor': fornecedor})
+    return render(request, 'fornecedores/editar_fornecedor.html', {'form': form, 'fornecedor': fornecedor})
 
 
 @login_required
@@ -45,4 +45,4 @@ def deletar(request, pk):
         fornecedor.delete()
         messages.success(request, 'Fornecedor deletado com sucesso!')
         return redirect('fornecedores:index')
-    return render(request, 'fornecedores/deletar.html', {'fornecedor': fornecedor})
+    return render(request, 'fornecedores/deletar_fornecedor.html', {'fornecedor': fornecedor})
