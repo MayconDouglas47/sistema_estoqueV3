@@ -1,13 +1,16 @@
-- Em desenvolvimento e correções -
+- Em desenvolvimento e correções 
   
 Sistema de Estoque
+
 Aplicação Django para gerenciamento de estoque (produtos, fornecedores, marcas e movimentações de entrada/saída).
 
 Funcionalidades
 Autenticação de usuários com 3 níveis de acesso:
+
 Admin
 Estoquista
 Caixa
+
 CRUD de:
 Categorias
 Marcas
@@ -20,7 +23,9 @@ Dashboard com KPIs e alertas de estoque baixo
 Relatórios:
 Relatório de estoque atual
 Histórico de movimentações
+
 Como rodar o projeto (Windows)
+
 1. Criar e ativar o ambiente virtual
 python -m venv venv
 
