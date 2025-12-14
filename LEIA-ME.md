@@ -27,6 +27,7 @@ Aplicação Django para gerenciamento de estoque
 ### 1. Criar e ativar o ambiente virtual
 
 python -m venv venv
+
 .\venv\Scripts\activate
 
 ### 2. Instalar dependências
