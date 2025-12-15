@@ -46,6 +46,7 @@ Relatório de estoque atual
 Histórico de movimentações
 
 ⚙️ Como rodar o projeto (Windows)
+
 1️⃣ Criar e ativar o ambiente virtual
 python -m venv venv
 .\venv\Scripts\activate
