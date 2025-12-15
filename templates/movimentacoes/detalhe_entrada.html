@@ -3,6 +3,7 @@
 {% block title %}Detalhe Entrada{% endblock %}
 
 {% block content %}
+<!-- Detalhes da entrada e lista de itens com opções de adicionar/editar/excluir -->
 <div class="container-fluid p-4">
     <div class="row mb-4">
         <div class="col-md-8">
@@ -13,7 +14,7 @@
             <p><strong>Observação:</strong> {{ entrada.observacao|default:"-" }}</p>
         </div>
         <div class="col-md-4 text-end">
-            <a href="{% url 'movimentacoes:index' %}" class="btn btn-secondary">Voltar</a>
+            <a href="{% url 'movimentacoes:entradas' %}" class="btn btn-secondary">Voltar</a>
             <a href="{% url 'movimentacoes:deletar_entrada' entrada.id %}" class="btn btn-danger">Excluir</a>
         </div>
     </div>

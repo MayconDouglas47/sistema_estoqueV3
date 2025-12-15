@@ -6,27 +6,93 @@
 </div>
 
 
-<div class="d-flex align-items-center">
-<div class="dropdown">
-<a class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle" href="#" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-	<strong>
-		{% if request.user.is_authenticated %}
-			{{ request.user.nome }} {% if request.user.get_nivel_acesso_display %}({{ request.user.get_nivel_acesso_display }}){% endif %}
-		{% else %}
-			Usuário
-		{% endif %}
-	</strong>
-</a>
-<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-	<li><a class="dropdown-item" href="{% url 'usuarios:profile' %}">Perfil</a></li>
-	<li>
-		<form method="POST" action="{% url 'logout' %}" style="margin: 0;">
-			{% csrf_token %}
-			<button type="submit" class="dropdown-item" style="background: none; border: none; cursor: pointer; text-align: left; width: 100%; padding: 0.5rem 1rem;">Sair</button>
-		</form>
-	</li>
-</ul>
-</div>
+<div class="d-flex align-items-center gap-3">
+	<!-- Perfil com dropdown de avatar e acesso ao perfil completo -->
+	<div class="dropdown">
+		<a class="d-flex align-items-center gap-2 text-dark text-decoration-none dropdown-toggle" href="#" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;">
+			<div
+				id="headerAvatar"
+				style="width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; background: #0b1224; border: 1px solid rgba(255,255,255,0.08);">
+				{% if request.user.is_authenticated and request.user.avatar == 'mulher' %}
+				<svg width="28" height="28" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+					<circle cx="32" cy="32" r="30" fill="#fff0f6" stroke="#ff4fa8" stroke-width="2" />
+					<circle cx="32" cy="26" r="11" fill="#ff6fa8" stroke="#ffe6f4" stroke-width="2" />
+					<path d="M18 50c2.5-8 9-12 14-12s11.5 4 14 12" fill="#ffe6f4" stroke="#ff4fa8" stroke-width="2" stroke-linecap="round" />
+				</svg>
+				{% else %}
+				<svg width="28" height="28" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+					<circle cx="32" cy="32" r="30" fill="#e8f1ff" stroke="#1e61ff" stroke-width="2" />
+					<circle cx="32" cy="26" r="11" fill="#1e61ff" stroke="#e8f1ff" stroke-width="2" />
+					<path d="M18 50c2.5-8 9-12 14-12s11.5 4 14 12" fill="#e8f1ff" stroke="#1e61ff" stroke-width="2" stroke-linecap="round" />
+				</svg>
+				{% endif %}
+			</div>
+			<div class="d-none d-md-flex flex-column">
+				<span class="fw-semibold" style="font-size: 14px; line-height: 1.2;">
+					{% if request.user.is_authenticated %}
+						{{ request.user.nome }}
+					{% else %}
+						Usuário
+					{% endif %}
+				</span>
+				<small class="text-muted" style="font-size: 12px;">
+					{% if request.user.is_authenticated and request.user.get_nivel_acesso_display %}
+						{{ request.user.get_nivel_acesso_display }}
+					{% endif %}
+				</small>
+			</div>
+		</a>
+		<ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="userDropdown" style="min-width: 280px;">
+			<li class="px-3 py-3 border-bottom bg-light">
+				<div class="d-flex align-items-center gap-3">
+					<div style="width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; background: #0b1224; border: 1px solid rgba(0,0,0,0.05);">
+						{% if request.user.avatar == 'mulher' %}
+						<svg width="34" height="34" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+							<circle cx="32" cy="32" r="30" fill="#fff0f6" stroke="#ff4fa8" stroke-width="2" />
+							<circle cx="32" cy="26" r="11" fill="#ff6fa8" stroke="#ffe6f4" stroke-width="2" />
+							<path d="M16 50c2.5-8 9-12 14-12s11.5 4 14 12" fill="#ffe6f4" stroke="#ff4fa8" stroke-width="2" stroke-linecap="round" />
+						</svg>
+						{% else %}
+						<svg width="34" height="34" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+							<circle cx="32" cy="32" r="30" fill="#e8f1ff" stroke="#1e61ff" stroke-width="2" />
+							<circle cx="32" cy="26" r="11" fill="#1e61ff" stroke="#e8f1ff" stroke-width="2" />
+							<path d="M16 50c2.5-8 9-12 14-12s11.5 4 14 12" fill="#e8f1ff" stroke="#1e61ff" stroke-width="2" stroke-linecap="round" />
+						</svg>
+						{% endif %}
+					</div>
+					<div>
+						<p class="mb-0 fw-bold" style="font-size: 15px;">{{ request.user.nome }}</p>
+						<small class="text-muted">@{{ request.user.login }}</small>
+					</div>
+				</div>
+			</li>
+			<li class="px-3 py-2">
+				<div class="d-flex align-items-center gap-2">
+					<i class='bx bx-shield-quarter' style='font-size: 18px; color: #6c757d;'></i>
+					<div>
+						<small class="text-muted d-block" style="font-size: 11px;">Nível de acesso</small>
+						<span class="fw-semibold" style="font-size: 13px;">{{ request.user.get_nivel_acesso_display }}</span>
+					</div>
+				</div>
+			</li>
+			<li><hr class="dropdown-divider my-1"></li>
+			<li>
+				<a class="dropdown-item d-flex align-items-center gap-2 py-2" href="{% url 'usuarios:profile' %}">
+					<i class='bx bx-user'></i>
+					<span>Ver perfil completo</span>
+				</a>
+			</li>
+		</ul>
+	</div>
+
+	<!-- Botão Sair -->
+	<form method="POST" action="{% url 'logout' %}" style="margin: 0;">
+		{% csrf_token %}
+		<button type="submit" class="btn btn-link text-danger text-decoration-none d-flex align-items-center gap-1 p-0" title="Sair da conta">
+			<i class='bx bx-log-out' style='font-size: 20px; transform: scaleX(-1);'></i>
+			<span class="d-none d-lg-inline">Sair</span>
+		</button>
+	</form>
 </div>
 </div>
 </header>

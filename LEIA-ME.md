@@ -1,47 +1,55 @@
-# Sistema de Estoque
+📦 Sistema de Estooque
 
-Aplicação Django para gerenciamento de estoque
-(produtos, fornecedores, marcas e movimentações de entrada/saída).
+🚧 Em desenvolvimento e correções de erros
 
-## Funcionalidades
+Aplicação Django para gerenciamento de estoque, permitindo o controle de produtos, fornecedores, marcas e movimentações de entrada e saída.
 
-- Autenticação de usuários com 3 níveis de acesso:
-  - Admin
-  - Estoquista
-  - Caixa
-- CRUD de:
-  - Categorias
-  - Marcas
-  - Fornecedores
-  - Produtos
-- Movimentações:
-  - Entrada e Saída de produtos
-  - Atualização automática do estoque
-- Dashboard com KPIs e alertas de estoque baixo
-- Relatórios:
-  - Relatório de estoque atual
-  - Histórico de movimentações
+🚀 Funcionalidades
+🔐 Autenticação de Usuários
 
-## Como rodar o projeto (Windows)
+Sistema de login com 3 níveis de acesso:
 
-### 1. Criar e ativar o ambiente virtual
+Admin
+
+Estoquista
+
+Caixa
+
+⚙️ Como rodar o projeto (Windows)
+
+1️⃣ Criar e ativar o ambiente virtual
 
 python -m venv venv
 
 .\venv\Scripts\activate
 
-### 2. Instalar dependências
+2️⃣ Instalar as dependências
 
 pip install -r requirements.txt
 
-### 3. aplicar migrações 
+3️⃣ Aplicar as migrações
 
 python manage.py migrate
 
-### 4. Rodar o servidor 
+4️⃣ Criar o primeiro usuário (Administrador)
+
+python manage.py createsuperuser
+
+O sistema solicitará:
+- **Username**: Nome de usuário para login
+- **Email**: E-mail (opcional, pode deixar em branco)
+- **Senha**: Senha de acesso (não aparece ao digitar)
+
+Este usuário terá:
+- ✅ Nível de acesso: **ADMINISTRADOR**
+- ✅ Acesso ao Django Admin: `http://127.0.0.1:8000/admin/`
+- ✅ Acesso total ao sistema (gerenciar usuários, fornecedores, produtos, movimentações)
+
+5️⃣ Rodar o servidor
 
 python manage.py runserver
 
-### Acesse:
+6️⃣ Acessar o sistema
 
-http://127.0.0.1:8000/
+Abra o navegador em: `http://127.0.0.1:8000/`
+

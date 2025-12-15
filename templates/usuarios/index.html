@@ -4,33 +4,36 @@
 
 {% block content %}
 <div class="container-fluid p-4">
+    <!-- Lista paginada de usuários com modal de criação -->
     <div class="row mb-4">
         <div class="col-md-6">
-            <h1 class="h3 mb-0">Usuários</h1>
+            <h1 class="h3 mb-0"><i class="bx bx-user-circle"></i> Usuários</h1>
         </div>
         <div class="col-md-6 text-end">
-            <a href="{% url 'usuarios:criar' %}" class="btn btn-primary">
-                <i class='bx bx-plus'></i> Novo Usuário
-            </a>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCriarUsuario">
+                <i class="bx bx-plus-circle"></i> Novo Usuário
+            </button>
         </div>
     </div>
 
     <div class="card">
         <div class="table-responsive">
-            <table class="table table-hover mb-0">
+            <table class="table table-hover table-sm mb-0">
                 <thead class="table-light">
                     <tr>
+                        <th style="width: 50px;">ID</th>
                         <th>Nome</th>
                         <th>Login</th>
-                        <th>Nível de Acesso</th>
-                        <th>Status</th>
-                        <th>Ações</th>
+                        <th style="width: 150px;">Nível de Acesso</th>
+                        <th style="width: 100px;">Status</th>
+                        <th style="width: 100px;">Ações</th>
                     </tr>
                 </thead>
-                <tbody>
-                    {% for u in usuarios %}
-                    <tr>
-                        <td>{{ u.nome }}</td>
+                <tbody id="usuariosTableBody">
+                    {% for u in page_obj %}
+                    <tr class="usuario-row" data-id="{{ u.id }}" data-nome="{{ u.nome|lower }}">
+                        <td><span class="badge bg-secondary">{{ u.id }}</span></td>
+                        <td><strong>{{ u.nome }}</strong></td>
                         <td>{{ u.login }}</td>
                         <td>{{ u.get_nivel_acesso_display }}</td>
                         <td>
@@ -40,20 +43,154 @@
                                 <span class="badge bg-danger">Inativo</span>
                             {% endif %}
                         </td>
-                        <td>
-                            <a href="{% url 'usuarios:ver' u.id %}" class="btn btn-sm btn-outline-secondary">Ver</a>
-                            <a href="{% url 'usuarios:editar' u.id %}" class="btn btn-sm btn-warning">Editar</a>
-                            <a href="{% url 'usuarios:deletar' u.id %}" class="btn btn-sm btn-danger">Excluir</a>
+                        <td class="text-start">
+                            <a href="{% url 'usuarios:detalhe' u.id %}" class="btn btn-sm btn-info" title="Ver detalhes" style="min-width: 75px; margin-left: -12px;">
+                                <i class="bx bx-info-circle"></i> Detalhes
+                            </a>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="5" class="text-muted">Nenhum usuário cadastrado.</td>
+                        <td colspan="6" class="text-center text-muted py-4">Nenhum usuário cadastrado.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
+
+    {% if is_paginated %}
+    <nav aria-label="Paginação" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page=1" title="Primeira"><i class="bx bx-chevrons-left"></i></a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}" title="Anterior"><i class="bx bx-chevron-left"></i></a></li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link"><i class="bx bx-chevrons-left"></i></span></li>
+                <li class="page-item disabled"><span class="page-link"><i class="bx bx-chevron-left"></i></span></li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% else %}
+                    <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}" title="Próxima"><i class="bx bx-chevron-right"></i></a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" title="Última"><i class="bx bx-chevrons-right"></i></a></li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link"><i class="bx bx-chevron-right"></i></span></li>
+                <li class="page-item disabled"><span class="page-link"><i class="bx bx-chevrons-right"></i></span></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
 </div>
+
+<!-- Modal Criar Usuário -->
+<div class="modal fade" id="modalCriarUsuario" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-3 shadow-lg">
+            <div class="modal-header bg-primary text-white border-0 rounded-top justify-content-center">
+                <h5 class="modal-title">Novo Usuário</h5>
+            </div>
+            <form id="formCriarUsuario">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="id_nome_user" class="form-label"><strong>Nome</strong></label>
+                        <input type="text" name="nome" id="id_nome_user" class="form-control" placeholder="Nome completo" required autofocus>
+                        <div id="erroNomeUsuario" class="text-danger mt-1" style="display: none;"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_login_user" class="form-label"><strong>Login</strong></label>
+                        <input type="text" name="login" id="id_login_user" class="form-control" placeholder="Login de acesso" required>
+                        <div id="erroLoginUsuario" class="text-danger mt-1" style="display: none;"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_senha_user" class="form-label"><strong>Senha</strong></label>
+                        <input type="password" name="senha" id="id_senha_user" class="form-control" placeholder="Senha de acesso" required>
+                        <div id="erroSenhaUsuario" class="text-danger mt-1" style="display: none;"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_nivel_user" class="form-label"><strong>Nível de Acesso</strong></label>
+                        <select name="nivel_acesso" id="id_nivel_user" class="form-select" required>
+                            <option value="admin">Admin</option>
+                            <option value="estoquista" selected>Estoquista</option>
+                            <option value="caixa">Caixa</option>
+                        </select>
+                        <div id="erroNivelUsuario" class="text-danger mt-1" style="display: none;"></div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bx bx-save"></i> Salvar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Form criar usuário via AJAX com validação inline básica
+        const formCriarUsuario = document.getElementById('formCriarUsuario');
+        if (formCriarUsuario) {
+            formCriarUsuario.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                formData.append('is_active', 'on'); // Usuário ativo por padrão
+                
+                // Limpar erros
+                document.getElementById('erroNomeUsuario').style.display = 'none';
+                document.getElementById('erroLoginUsuario').style.display = 'none';
+                document.getElementById('erroSenhaUsuario').style.display = 'none';
+                document.getElementById('erroNivelUsuario').style.display = 'none';
+
+                fetch('{% url "usuarios:criar" %}', {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        if (data.errors) {
+                            if (data.errors.nome) {
+                                document.getElementById('erroNomeUsuario').textContent = data.errors.nome[0];
+                                document.getElementById('erroNomeUsuario').style.display = 'block';
+                            }
+                            if (data.errors.login) {
+                                document.getElementById('erroLoginUsuario').textContent = data.errors.login[0];
+                                document.getElementById('erroLoginUsuario').style.display = 'block';
+                            }
+                            if (data.errors.senha) {
+                                document.getElementById('erroSenhaUsuario').textContent = data.errors.senha[0];
+                                document.getElementById('erroSenhaUsuario').style.display = 'block';
+                            }
+                            if (data.errors.nivel_acesso) {
+                                document.getElementById('erroNivelUsuario').textContent = data.errors.nivel_acesso[0];
+                                document.getElementById('erroNivelUsuario').style.display = 'block';
+                            }
+                        }
+                    }
+                })
+                .catch(err => {
+                    console.error('Erro:', err);
+                });
+            });
+        }
+    });
+</script>
 {% endblock %}

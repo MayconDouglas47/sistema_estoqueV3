@@ -1,165 +1,217 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+{% load static %}
 
 {% block title %}Produtos{% endblock %}
 
 {% block content %}
+<!-- Lista de produtos com busca, editar e excluir (com checagem de movimentações) -->
 <div class="container-fluid p-4">
     <div class="row mb-4">
         <div class="col-md-6">
-            <h1 class="h3 mb-0">Produtos</h1>
+            <h1 class="h3 mb-0"><i class="bx bx-package"></i> Produtos</h1>
         </div>
         <div class="col-md-6 text-end">
-            <a href="{% url 'produtos:criar' %}" class="btn btn-primary">
-                <i class='bx bx-plus'></i> Novo Produto
+            <a href="{% url "produtos:criar" %}" class="btn btn-primary">
+                <i class="bx bx-plus-circle"></i> Novo Produto
             </a>
         </div>
     </div>
 
     {% if messages %}
         {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} fade show">
-                {{ message }}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                <i class="bx bx-check-circle"></i> {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         {% endfor %}
     {% endif %}
-    
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-text bg-light">
+                    <i class="bx bx-search"></i>
+                </span>
+                <input 
+                    type="text" 
+                    class="form-control" 
+                    id="searchInput" 
+                    placeholder="Buscar por ID ou nome..."
+                    aria-label="Buscar produto">
+            </div>
+        </div>
+    </div>
+
     <div class="card">
         <div class="table-responsive">
             <table class="table table-hover mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th>ID</th>
+                        <th style="width: 50px;">ID</th>
                         <th>Nome</th>
-                        <th>Categoria</th>
-                        <th>Marca</th>
-                        <th>Fornecedor</th>
-                        <th>Estoque</th>
+                        <th style="width: 100px;">Categoria</th>
+                        <th style="width: 100px;">Marca</th>
+                        <th style="width: 80px;">Estoque</th>
                         <th style="width: 200px;">Ações</th>
                     </tr>
                 </thead>
-                <tbody>
-                    {% for produto in produtos %}
-                    <tr>
-                        <td>{{ produto.id }}</td>
-                        <td>{{ produto.nome }}</td>
-                        <td>{{ produto.categoria.nome }}</td>
-                        <td>{{ produto.marca.nome|default:'-' }}</td>
-                        <td>{{ produto.fornecedor.nome|default:'-' }}</td>
+                <tbody id="produtosTableBody">
+                    {% for produto in page_obj %}
+                    <tr class="produto-row" data-id="{{ produto.id }}" data-nome="{{ produto.nome|lower }}">
+                        <td><span class="badge bg-secondary">{{ produto.id }}</span></td>
+                        <td><strong>{{ produto.nome }}</strong></td>
+                        <td class="text-nowrap"><small>{{ produto.categoria.nome }}</small></td>
+                        <td class="text-nowrap"><small>{{ produto.marca.nome|default:"-" }}</small></td>
                         <td>{{ produto.estoque_atual }}</td>
                         <td>
-                            <a href="{% url 'produtos:editar' produto.id %}" class="btn btn-sm btn-warning">
-                                <i class='bx bx-edit'></i> Editar
+                            <a href="{% url "produtos:editar" produto.id %}" class="btn btn-sm btn-warning">
+                                <i class="bx bx-edit"></i> Editar
                             </a>
-                            
-                            <button 
-                                type="button"
-                                class="btn btn-sm btn-danger btn-excluir-produto" 
-                                data-id="{{ produto.id }}"
-                                data-nome="{{ produto.nome }}">
-                                <i class='bx bx-trash'></i> Excluir
+
+                            <button type="button" class="btn btn-sm btn-danger btn-excluir-produto" data-id="{{ produto.id }}" data-nome="{{ produto.nome }}">
+                                <i class="bx bx-trash"></i> Excluir
                             </button>
-                            
                         </td>
                     </tr>
                     {% empty %}
-                    <tr>
-                        <td colspan="7" class="text-center text-muted py-4">Nenhum produto cadastrado</td>
-                    </tr>
+                    <tr><td colspan="6" class="text-center text-muted py-4"><i class="bx bx-inbox"></i> Nenhum produto</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
+
+    {% if is_paginated %}
+    <nav aria-label="Paginação" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page=1" title="Primeira"><i class="bx bx-chevrons-left"></i></a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}" title="Anterior"><i class="bx bx-chevron-left"></i></a></li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link"><i class="bx bx-chevrons-left"></i></span></li>
+                <li class="page-item disabled"><span class="page-link"><i class="bx bx-chevron-left"></i></span></li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% else %}
+                    <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}" title="Próxima"><i class="bx bx-chevron-right"></i></a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" title="Última"><i class="bx bx-chevrons-right"></i></a></li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link"><i class="bx bx-chevron-right"></i></span></li>
+                <li class="page-item disabled"><span class="page-link"><i class="bx bx-chevrons-right"></i></span></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
 </div>
 
-<div class="modal fade" id="modalConfirmacaoExclusao" tabindex="-1" aria-labelledby="modalConfirmacaoExclusaoLabel" aria-hidden="true">
+<div class="modal fade" id="modalAvisoProduto" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-warning">
+            <div class="modal-header bg-warning text-dark d-flex justify-content-center">
+                <h5 class="modal-title">AVISO</h5>
+            </div>
+            <div class="modal-body text-center">
+                Não é possível excluir este produto pois existem movimentações associadas a ele.
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Voltar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalExcluirProduto" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-danger">
             <div class="modal-header bg-danger text-white d-flex justify-content-center">
-                <h5 class="modal-title" id="modalConfirmacaoExclusaoLabel">Excluir Produto</h5>
+                <h5 class="modal-title">Excluir Produto</h5>
             </div>
-            
             <div class="modal-body">
                 <p>
                     Tem certeza que deseja excluir o produto: <br>
-                    <strong id="itemParaExcluirNome"></strong>?
+                    <strong id="nomeProduto"></strong>?
                 </p>
-                
                 <p class="text-danger mb-0">
                     <strong>Esta ação não pode ser desfeita.</strong>
                 </p>
             </div>
-            
             <div class="modal-footer">
                 <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button class="btn btn-danger" id="btnConfirmarExclusao">Sim, Excluir</button>
+                <button class="btn btn-danger" id="confirmarExclusaoProduto">Sim, excluir</button>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-// Garante que o script só rode após o carregamento completo do HTML e do Bootstrap
-document.addEventListener('DOMContentLoaded', function() {
-    let itemIdParaExcluir = null;
-    const modalElement = document.getElementById('modalConfirmacaoExclusao');
-    
-    if (!modalElement) {
-        console.error("Erro: O elemento modalConfirmacaoExclusao não foi encontrado no DOM.");
-        return; 
-    }
+    let produtoId = null;
 
-    const modalExclusao = new bootstrap.Modal(modalElement);
-    const nomeItemDisplay = document.getElementById('itemParaExcluirNome');
-    const btnConfirmar = document.getElementById('btnConfirmarExclusao');
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
 
-    // 1. Configura o clique em CADA botão de exclusão na tabela
-    document.querySelectorAll('.btn-excluir-produto').forEach(btn => {
-        btn.addEventListener('click', function() {
-            itemIdParaExcluir = this.dataset.id;
-            const nomeItem = this.dataset.nome; 
-            
-            if (nomeItemDisplay) {
-                 nomeItemDisplay.innerText = nomeItem;
-            }
-           
-            // Abre o modal
-            modalExclusao.show();
-        });
-    });
+        // Busca em tempo real
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function() {
+                const searchTerm = this.value.toLowerCase();
+                document.querySelectorAll('.produto-row').forEach(row => {
+                    const id = row.getAttribute('data-id');
+                    const nome = row.getAttribute('data-nome');
 
-    // 2. Configura o clique no botão "Sim, Excluir" do modal
-    if (btnConfirmar) {
-        btnConfirmar.addEventListener('click', function() {
-            
-            const urlExclusao = `{% url "produtos:deletar" 0 %}`.replace('0', itemIdParaExcluir); 
-            
-            modalExclusao.hide();
+                    if (id.includes(searchTerm) || nome.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        }
 
-            // Envia a requisição Fetch/AJAX para a View (views.py)
-            fetch(urlExclusao, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}',
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) { 
-                     // Se a exclusão no backend foi sucesso, recarrega a página para mostrar a mensagem de sucesso
-                     window.location.href = '{% url "produtos:index" %}';
-                } else {
-                     alert('Erro ao excluir: ' + (data.error || 'Ocorreu um erro no servidor.'));
-                }
-            })
-            .catch(error => {
-                console.error('Erro na requisição:', error);
-                alert('Ocorreu um erro de comunicação com o servidor.');
+        document.querySelectorAll('.btn-excluir-produto').forEach(btn => {
+            btn.addEventListener('click', () => {
+                produtoId = btn.dataset.id;
+                const nome = btn.dataset.nome;
+
+                fetch(`/produtos/${produtoId}/deletar/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'X-Check-Only': 'true'
+                    }
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.can_delete) {
+                            document.getElementById('nomeProduto').innerText = nome;
+                            new bootstrap.Modal(
+                                document.getElementById('modalExcluirProduto')
+                            ).show();
+                        } else {
+                            new bootstrap.Modal(
+                                document.getElementById('modalAvisoProduto')
+                            ).show();
+                        }
+                    });
             });
         });
-    }
-});
-</script>
 
+        document.getElementById('confirmarExclusaoProduto').addEventListener('click', () => {
+            fetch(`/produtos/${produtoId}/deletar/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+                .then(res => res.json())
+                .then(() => location.reload());
+        });
+    });
+</script>
 {% endblock %}

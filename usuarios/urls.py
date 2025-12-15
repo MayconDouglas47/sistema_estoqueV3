@@ -8,7 +8,8 @@ urlpatterns = [
     path("dashboard/", views.dashboard, name="dashboard"),
     path("profile/", views.profile, name="profile"),
     path("criar/", views.criar_usuario, name="criar"),
+    path("detalhe/<int:pk>/", views.detalhe, name="detalhe"),
     path("editar/<int:id>/", views.editar_usuario, name="editar"),
     path("deletar/<int:id>/", views.deletar_usuario, name="deletar"),
-    path("ver/<int:id>/", views.ver_usuario, name="ver"),
+    path("<int:pk>/avatar/", views.atualizar_avatar, name="atualizar_avatar"),
 ]

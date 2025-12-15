@@ -4,20 +4,28 @@
 {% block title %}Editar Produto{% endblock %}
 
 {% block content %}
+<!-- Edição de produto existente com mesmo form crispy -->
 <div class="container-fluid p-4">
     <div class="row">
         <div class="col-md-8 offset-md-2">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                        <i class="bx bx-check-circle"></i> {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
             <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Editar Produto</h5>
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="bx bx-edit"></i> Editar Produto</h5>
                 </div>
                 <div class="card-body">
-                    <form method="post">
-                        {% csrf_token %}
+                    <form method="post">{% csrf_token %}
                         {{ form|crispy }}
-                        <div class="d-grid gap-2 d-sm-flex justify-content-sm-end">
+                        <div class="d-flex gap-2 justify-content-end pt-3 border-top">
                             <a href="{% url 'produtos:index' %}" class="btn btn-secondary">Cancelar</a>
-                            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                            <button type="submit" class="btn btn-warning"><i class="bx bx-save"></i> Salvar Alterações</button>
                         </div>
                     </form>
                 </div>

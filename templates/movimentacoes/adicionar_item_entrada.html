@@ -4,6 +4,7 @@
 {% block title %}Adicionar Item à Entrada{% endblock %}
 
 {% block content %}
+<!-- Adiciona produto+quantidade+preço à entrada existente -->
 <div class="container-fluid p-4">
     <div class="row">
         <div class="col-md-6 offset-md-3">
@@ -14,7 +15,7 @@
                         {% csrf_token %}
                         {{ form|crispy }}
                         <div class="d-grid gap-2 d-sm-flex justify-content-sm-end">
-                            <a href="{% url 'movimentacoes:index' %}" class="btn btn-secondary">Cancelar</a>
+                            <a href="{% url 'movimentacoes:detalhe_entrada' entrada.id %}" class="btn btn-secondary">Cancelar</a>
                             <button type="submit" class="btn btn-success">Adicionar Item</button>
                         </div>
                     </form>

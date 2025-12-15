@@ -1,59 +1,148 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Movimentações{% endblock %}
 
 {% block content %}
+<!-- Hub de movimentações: entradas/saídas recentes e links rápidos para relatórios -->
 <div class="container-fluid p-4">
+    <!-- Cabeçalho e Botões -->
     <div class="row mb-4">
         <div class="col-md-6">
-            <h1 class="h3 mb-0">Movimentações</h1>
+            <h1 class="h3 mb-0">
+                <i class='bx bx-arrow-from-left'></i> Movimentações
+            </h1>
         </div>
         <div class="col-md-6 text-end">
-            <a href="{% url 'movimentacoes:criar_entrada' %}" class="btn btn-success me-2">Nova Entrada</a>
-            <a href="{% url 'movimentacoes:criar_saida' %}" class="btn btn-danger">Nova Saída</a>
+            <a href="{% url 'movimentacoes:criar_entrada' %}" class="btn btn-success me-2">
+                <i class='bx bx-arrow-from-bottom'></i> Nova Entrada
+            </a>
+            <a href="{% url 'movimentacoes:criar_saida' %}" class="btn btn-danger">
+                <i class='bx bx-arrow-to-bottom'></i> Nova Saída
+            </a>
         </div>
     </div>
 
+    <!-- Mensagens de Feedback -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                <i class='bx bx-check-circle'></i> {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
     <div class="row">
-        <div class="col-md-6">
-            <h5>Entradas Recentes</h5>
-            <div class="card mb-4">
-                <ul class="list-group list-group-flush">
-                    {% for e in entradas %}
-                        <li class="list-group-item d-flex justify-content-between align-items-start">
-                            <div>
-                                <a href="{% url 'movimentacoes:detalhe_entrada' e.id %}" class="fw-bold text-decoration-none">Entrada #{{ e.id }}</a>
-                                <small class="d-block">{{ e.data_entrada }}</small>
-                                <small class="d-block text-muted">Fornecedor: {{ e.fornecedor.nome|default:"-" }}</small>
-                            </div>
-                            <div>
-                                <a href="{% url 'movimentacoes:deletar_entrada' e.id %}" class="btn btn-sm btn-danger">Excluir</a>
-                            </div>
-                        </li>
-                    {% empty %}
-                        <li class="list-group-item text-center text-muted">Nenhuma entrada</li>
-                    {% endfor %}
-                </ul>
+        <!-- Entradas Recentes -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class='bx bx-arrow-from-bottom'></i> Entradas Recentes
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if entradas %}
+                        <ul class="list-group list-group-flush">
+                            {% for e in entradas %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                    <div>
+                                        <a href="{% url 'movimentacoes:detalhe_entrada' e.id %}" class="fw-bold text-decoration-none">
+                                            Entrada #{{ e.id }}
+                                        </a>
+                                        <small class="d-block text-muted">
+                                            <i class='bx bx-calendar'></i> {{ e.data_entrada|date:"d/m/Y" }}
+                                        </small>
+                                        <small class="d-block text-muted">
+                                            <i class='bx bx-truck'></i> {{ e.fornecedor.nome|default:"-" }}
+                                        </small>
+                                    </div>
+                                    <div>
+                                        <span class="badge bg-info">{{ e.itens.count }} itens</span>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <div class="text-center text-muted py-5">
+                            <i class='bx bx-inbox' style="font-size: 2rem;"></i>
+                            <p class="mt-2">Nenhuma entrada cadastrada</p>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
-        <div class="col-md-6">
-            <h5>Saídas Recentes</h5>
-            <div class="card mb-4">
-                <ul class="list-group list-group-flush">
-                    {% for s in saidas %}
-                        <li class="list-group-item d-flex justify-content-between align-items-start">
-                            <div>
-                                <a href="{% url 'movimentacoes:detalhe_saida' s.id %}" class="fw-bold text-decoration-none">Saída #{{ s.id }} — {{ s.get_tipo_saida_display }}</a>
-                                <small class="d-block">{{ s.data_saida }}</small>
-                            </div>
-                            <div>
-                                <a href="{% url 'movimentacoes:deletar_saida' s.id %}" class="btn btn-sm btn-danger">Excluir</a>
-                            </div>
-                        </li>
-                    {% empty %}
-                        <li class="list-group-item text-center text-muted">Nenhuma saída</li>
-                    {% endfor %}
-                </ul>
+
+        <!-- Saídas Recentes -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class='bx bx-arrow-to-bottom'></i> Saídas Recentes
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if saidas %}
+                        <ul class="list-group list-group-flush">
+                            {% for s in saidas %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                    <div>
+                                        <a href="{% url 'movimentacoes:detalhe_saida' s.id %}" class="fw-bold text-decoration-none">
+                                            Saída #{{ s.id }} — <span class="badge bg-secondary">{{ s.get_tipo_saida_display }}</span>
+                                        </a>
+                                        <small class="d-block text-muted">
+                                            <i class='bx bx-calendar'></i> {{ s.data_saida|date:"d/m/Y" }}
+                                        </small>
+                                    </div>
+                                    <div>
+                                        <span class="badge bg-info">{{ s.itens.count }} itens</span>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <div class="text-center text-muted py-5">
+                            <i class='bx bx-inbox' style="font-size: 2rem;"></i>
+                            <p class="mt-2">Nenhuma saída cadastrada</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Links Rápidos -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class='bx bx-link'></i> Acessos Rápidos
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-3 mb-2">
+                            <a href="{% url 'movimentacoes:entradas' %}" class="btn btn-outline-success w-100">
+                                <i class='bx bx-list-ul'></i> Ver Todas as Entradas
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{% url 'movimentacoes:saidas' %}" class="btn btn-outline-danger w-100">
+                                <i class='bx bx-list-ul'></i> Ver Todas as Saídas
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{% url 'movimentacoes:stock_report' %}" class="btn btn-outline-primary w-100">
+                                <i class='bx bx-bar-chart'></i> Relatório de Estoque
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{% url 'movimentacoes:history' %}" class="btn btn-outline-info w-100">
+                                <i class='bx bx-history'></i> Histórico
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

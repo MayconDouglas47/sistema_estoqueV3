@@ -1,167 +1,291 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+{% load static %}
 
 {% block title %}Categorias{% endblock %}
 
 {% block content %}
 <div class="container-fluid p-4">
+    <!-- Lista de categorias com busca, criação/edição em modais e confirmação de exclusão -->
     <div class="row mb-4">
         <div class="col-md-6">
-            <h1 class="h3 mb-0">Categorias</h1>
+            <h1 class="h3 mb-0"><i class="bx bx-folder"></i> Categorias</h1>
         </div>
         <div class="col-md-6 text-end">
-            <a href="{% url 'categorias:criar' %}" class="btn btn-primary">
-                <i class='bx bx-plus'></i> Nova Categoria
-            </a>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCriarCategoria">
+                <i class="bx bx-plus-circle"></i> Nova Categoria
+            </button>
         </div>
     </div>
 
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-text bg-light">
+                    <i class="bx bx-search"></i>
+                </span>
+                <input 
+                    type="text" 
+                    class="form-control" 
+                    id="searchInput" 
+                    placeholder="Buscar por ID ou nome..."
+                    aria-label="Buscar categoria">
             </div>
-        {% endfor %}
-    {% endif %}
+        </div>
+    </div>
 
     <div class="card">
         <div class="table-responsive">
             <table class="table table-hover mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th>ID</th>
+                        <th style="width: 50px;">ID</th>
                         <th>Nome</th>
                         <th>Descrição</th>
                         <th style="width: 200px;">Ações</th>
                     </tr>
                 </thead>
-                <tbody>
-                    {% for categoria in categorias %}
-                        <tr>
-                            <td>{{ categoria.id }}</td>
-                            <td>{{ categoria.nome }}</td>
+                <tbody id="categoriasTableBody">
+                    {% for categoria in page_obj %}
+                        <tr class="categoria-row" data-id="{{ categoria.id }}" data-nome="{{ categoria.nome|lower }}">
+                            <td><span class="badge bg-secondary">{{ categoria.id }}</span></td>
+                            <td><strong>{{ categoria.nome }}</strong></td>
+                            <td>{% if categoria.descricao %}<small>{{ categoria.descricao|truncatechars:60 }}</small>{% else %}<span class="text-muted">-</span>{% endif %}</td>
                             <td>
-                                {% if categoria.descricao %}
-                                    {{ categoria.descricao|truncatechars:60 }}
-                                {% else %}
-                                    <span class="text-muted">—</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <a href="{% url 'categorias:editar' categoria.id %}"
-                                   class="btn btn-sm btn-warning">
-                                    <i class='bx bx-edit'></i> Editar
-                                </a>
-                                <button 
-                                    type="button"
-                                    class="btn btn-sm btn-danger btn-excluir-categoria" 
-                                    data-id="{{ categoria.id }}"
+                                <button type="button" class="btn btn-sm btn-warning btn-abrir-editar-categoria"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modalEditarCategoria"
+                                    data-action="{% url 'categorias:editar' categoria.id %}"
+                                    data-nome="{{ categoria.nome }}"
+                                    data-descricao="{{ categoria.descricao|default_if_none:'' }}">
+                                    <i class="bx bx-edit"></i> Editar
+                                </button>
+
+                                <button type="button" class="btn btn-sm btn-danger btn-excluir-categoria" 
+                                    data-id="{{ categoria.id }}" 
                                     data-nome="{{ categoria.nome }}">
-                                    <i class='bx bx-trash'></i> Excluir
+                                    <i class="bx bx-trash"></i> Excluir
                                 </button>
                             </td>
                         </tr>
                     {% empty %}
-                        <tr>
-                            <td colspan="4" class="text-center text-muted py-4">
-                                Nenhuma categoria cadastrada
-                            </td>
-                        </tr>
+                        <tr><td colspan="4" class="text-center text-muted py-4"><i class="bx bx-inbox"></i> Nenhuma categoria</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
+
+    {% if is_paginated %}
+        <nav aria-label="Paginação" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page=1" title="Primeira"><i class="bx bx-chevrons-left"></i></a></li>
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}" title="Anterior"><i class="bx bx-chevron-left"></i></a></li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link"><i class="bx bx-chevrons-left"></i></span></li>
+                    <li class="page-item disabled"><span class="page-link"><i class="bx bx-chevron-left"></i></span></li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                    {% else %}
+                        <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}" title="Próxima"><i class="bx bx-chevron-right"></i></a></li>
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" title="Última"><i class="bx bx-chevrons-right"></i></a></li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link"><i class="bx bx-chevron-right"></i></span></li>
+                    <li class="page-item disabled"><span class="page-link"><i class="bx bx-chevrons-right"></i></span></li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
 </div>
 
-<div class="modal fade" id="modalConfirmacaoExclusao" tabindex="-1" aria-labelledby="modalConfirmacaoExclusaoLabel" aria-hidden="true">
+<!-- Modal Criar Categoria -->
+<div class="modal fade" id="modalCriarCategoria" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-3 shadow-lg">
+            <div class="modal-header bg-primary text-white border-0 rounded-top justify-content-center">
+                <h5 class="modal-title">Nova Categoria</h5>
+            </div>
+            <form id="formCriarCategoria">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="id_nome_cat" class="form-label"><strong>Nome da Categoria</strong></label>
+                        <input type="text" name="nome" id="id_nome_cat" class="form-control" placeholder="Digite o nome da categoria" required autofocus>
+                        <div id="erroNomeCategoria" class="text-danger mt-1" style="display: none;"></div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bx bx-save"></i> Salvar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Categoria -->
+<div class="modal fade" id="modalEditarCategoria" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-3 shadow-lg">
+            <div class="modal-header bg-warning text-dark border-0 rounded-top justify-content-center">
+                <h5 class="modal-title">Editar Categoria</h5>
+            </div>
+            <form id="formEditarCategoria" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="id_nome_cat_editar" class="form-label"><strong>Nome da Categoria</strong></label>
+                        <input type="text" name="nome" id="id_nome_cat_editar" class="form-control" placeholder="Digite o nome da categoria" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_desc_cat_editar" class="form-label"><strong>Descrição</strong></label>
+                        <textarea name="descricao" id="id_desc_cat_editar" class="form-control" rows="3" placeholder="Descrição (opcional)"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-warning"><i class="bx bx-save"></i> Atualizar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Preenche o modal de edição com a categoria escolhida
+document.addEventListener('DOMContentLoaded', function() {
+    var modalCategoria = document.getElementById('modalEditarCategoria');
+    var nomeInput = document.getElementById('id_nome_cat_editar');
+    var descInput = document.getElementById('id_desc_cat_editar');
+    var formEditar = document.getElementById('formEditarCategoria');
+
+    modalCategoria.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;
+        var action = button.getAttribute('data-action');
+        var nome = button.getAttribute('data-nome');
+        var descricao = button.getAttribute('data-descricao') || '';
+
+        formEditar.action = action;
+        nomeInput.value = nome;
+        descInput.value = descricao;
+    });
+});
+</script>
+
+<div class="modal fade" id="modalExcluirCategoria" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-danger">
             <div class="modal-header bg-danger text-white d-flex justify-content-center">
-                <h5 class="modal-title" id="modalConfirmacaoExclusaoLabel">Excluir Categoria</h5>
+                <h5 class="modal-title">Excluir Categoria</h5>
             </div>
-            
             <div class="modal-body">
                 <p>
                     Tem certeza que deseja excluir a categoria: <br>
-                    <strong id="itemParaExcluirNome"></strong>?
+                    <strong id="nomeCategoria"></strong>?
                 </p>
-                
                 <p class="text-danger mb-0">
                     <strong>Esta ação não pode ser desfeita.</strong>
                 </p>
             </div>
-            
             <div class="modal-footer">
                 <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button class="btn btn-danger" id="btnConfirmarExclusao">Sim, Excluir</button>
+                <button class="btn btn-danger" id="confirmarExclusaoCategoria">Sim, excluir</button>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    let itemIdParaExcluir = null;
-    const modalElement = document.getElementById('modalConfirmacaoExclusao');
-    
-    if (!modalElement) {
-        console.error("Erro: O elemento modalConfirmacaoExclusao não foi encontrado no DOM.");
-        return; 
-    }
+    let categoriaId = null;
 
-    const modalExclusao = new bootstrap.Modal(modalElement);
-    const nomeItemDisplay = document.getElementById('itemParaExcluirNome');
-    const btnConfirmar = document.getElementById('btnConfirmarExclusao');
+    // Busca em tempo real, criação via AJAX e exclusão com checagem no backend
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
 
-    // 1. Configura o clique em CADA botão de exclusão na tabela
-    document.querySelectorAll('.btn-excluir-categoria').forEach(btn => { // Seletor Alterado para .btn-excluir-categoria
-        btn.addEventListener('click', function() {
-            itemIdParaExcluir = this.dataset.id;
-            const nomeItem = this.dataset.nome; 
-            
-            if (nomeItemDisplay) {
-                 nomeItemDisplay.innerText = nomeItem;
-            }
-           
-            // Abre o modal
-            modalExclusao.show();
-        });
-    });
+        // Busca em tempo real
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function() {
+                const searchTerm = this.value.toLowerCase();
+                document.querySelectorAll('.categoria-row').forEach(row => {
+                    const id = row.getAttribute('data-id');
+                    const nome = row.getAttribute('data-nome');
 
-    // 2. Configura o clique no botão "Sim, Excluir" do modal
-    if (btnConfirmar) {
-        btnConfirmar.addEventListener('click', function() {
-            
-            // URL: Ajustado para a rota 'categorias:deletar'
-            const urlExclusao = `{% url "categorias:deletar" 0 %}`.replace('0', itemIdParaExcluir); 
-            
-            modalExclusao.hide();
+                    if (id.includes(searchTerm) || nome.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        }
 
-            // Envia a requisição Fetch/AJAX para a View (views.py)
-            fetch(urlExclusao, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}',
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) { 
-                     // Se a exclusão no backend foi sucesso, recarrega a página 
-                     window.location.href = '{% url "categorias:index" %}';
-                } else {
-                     alert('Erro ao excluir: ' + (data.error || 'Ocorreu um erro no servidor.'));
-                }
-            })
-            .catch(error => {
-                console.error('Erro na requisição:', error);
-                alert('Ocorreu um erro de comunicação com o servidor.');
+        // Form criar categoria via AJAX
+        const formCriarCategoria = document.getElementById('formCriarCategoria');
+        if (formCriarCategoria) {
+            formCriarCategoria.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                const erroNome = document.getElementById('erroNomeCategoria');
+                erroNome.style.display = 'none';
+
+                fetch('{% url "categorias:criar" %}', {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        if (data.errors && data.errors.nome) {
+                            erroNome.textContent = data.errors.nome[0];
+                            erroNome.style.display = 'block';
+                        }
+                    }
+                })
+                .catch(err => {
+                    console.error('Erro:', err);
+                });
+            });
+        }
+
+        document.querySelectorAll('.btn-excluir-categoria').forEach(btn => {
+            btn.addEventListener('click', () => {
+                categoriaId = btn.dataset.id;
+                const nome = btn.dataset.nome;
+                
+                document.getElementById('nomeCategoria').innerText = nome;
+                new bootstrap.Modal(
+                    document.getElementById('modalExcluirCategoria')
+                ).show();
             });
         });
-    }
-});
-</script>
 
+        document.getElementById('confirmarExclusaoCategoria').addEventListener('click', () => {
+            fetch(`/categorias/${categoriaId}/deletar/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+                .then(res => res.json())
+                .then(() => location.reload());
+        });
+    });
+</script>
 {% endblock %}

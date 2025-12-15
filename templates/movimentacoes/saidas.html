@@ -1,34 +1,322 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Saídas{% endblock %}
 
 {% block content %}
+<!-- Lista paginada de saídas com badges de tipo (venda/perda/devolução/ajuste) e filtros -->
+<form style="display: none;">
+    {% csrf_token %}
+</form>
 <div class="container-fluid p-4">
-    <div class="row mb-3">
-        <div class="col-md-6">
-            <h1 class="h3">Saídas</h1>
+    <!-- Cabeçalho -->
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-6 mb-3 mb-md-0">
+            <h1 class="h3 mb-0 d-flex align-items-center gap-2">
+                <span class="badge bg-danger bg-opacity-25 text-danger rounded-circle p-2" style="font-size: 1.1rem;">
+                    <i class='bx bx-arrow-to-bottom'></i>
+                </span>
+                Saídas
+            </h1>
         </div>
-        <div class="col-md-6 text-end">
-            <a href="{% url 'movimentacoes:criar_saida' %}" class="btn btn-danger">Nova Saída</a>
+        <div class="col-md-6 text-md-end text-center">
+            <a href="{% url 'movimentacoes:criar_saida' %}" class="btn btn-danger">
+                <i class='bx bx-plus-circle'></i> Nova Saída
+            </a>
         </div>
     </div>
 
-    <div class="card">
-        <ul class="list-group list-group-flush">
-            {% for s in saidas %}
-            <li class="list-group-item d-flex justify-content-between align-items-start">
-                <div>
-                    <a href="{% url 'movimentacoes:detalhe_saida' s.id %}" class="fw-bold text-decoration-none">Saída #{{ s.id }} — {{ s.get_tipo_saida_display }}</a>
-                    <small class="d-block">{{ s.data_saida }}</small>
+    <!-- Cards de resumo -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted mb-1">Total de saídas</p>
+                        <h4 class="mb-0">{{ total_saidas }}</h4>
+                    </div>
+                    <span class="badge bg-danger bg-opacity-25 text-danger p-3">
+                        <i class='bx bx-export'></i>
+                    </span>
                 </div>
-                <div>
-                    <a href="{% url 'movimentacoes:deletar_saida' s.id %}" class="btn btn-sm btn-danger">Deletar</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted mb-1">Itens movimentados</p>
+                        <h4 class="mb-0">{{ total_itens }}</h4>
+                    </div>
+                    <span class="badge bg-primary bg-opacity-25 text-primary p-3">
+                        <i class='bx bx-package'></i>
+                    </span>
                 </div>
-            </li>
-            {% empty %}
-            <li class="list-group-item text-center text-muted">Nenhuma saída</li>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="text-muted mb-1">Última saída</p>
+                        <h5 class="mb-0">{% if ultima_saida %}{{ ultima_saida.data_saida|date:"d/m/Y H:i" }}{% else %}-{% endif %}</h5>
+                    </div>
+                    <span class="badge bg-dark text-white bg-opacity-50 p-3">
+                        <i class='bx bx-time'></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensagens -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                <i class='bx bx-check-circle'></i> {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Busca -->
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-text bg-light">
+                    <i class='bx bx-search'></i>
+                </span>
+                <input 
+                    type="text" 
+                    class="form-control" 
+                    id="searchInput" 
+                    placeholder="Buscar por ID ou tipo..."
+                    aria-label="Buscar saída">
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabela de Saídas -->
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover table-sm align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 70px;">ID</th>
+                        <th style="width: 160px;">Data</th>
+                        <th>Tipo</th>
+                        <th style="width: 90px;">Itens</th>
+                        <th style="width: 200px;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="saidasTableBody">
+                    {% for s in page_obj %}
+                    <tr class="saida-row" data-id="{{ s.id }}" data-tipo="{{ s.get_tipo_saida_display|lower }}">
+                        <td>
+                            <span class="badge bg-secondary">{{ s.id }}</span>
+                        </td>
+                        <td>
+                            <small class="text-muted">{{ s.data_saida|date:"d/m/Y H:i" }}</small>
+                        </td>
+                        <td>
+                            {% if s.tipo_saida == 'venda' %}
+                                <span class="badge bg-success">{{ s.get_tipo_saida_display }}</span>
+                            {% elif s.tipo_saida == 'perda' %}
+                                <span class="badge bg-danger">{{ s.get_tipo_saida_display }}</span>
+                            {% elif s.tipo_saida == 'devolucao' %}
+                                <span class="badge bg-warning">{{ s.get_tipo_saida_display }}</span>
+                            {% elif s.tipo_saida == 'ajuste' %}
+                                <span class="badge bg-primary">{{ s.get_tipo_saida_display }}</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ s.get_tipo_saida_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ s.total_itens }}
+                        </td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <a 
+                                    href="{% url 'movimentacoes:detalhe_saida' s.id %}" 
+                                    class="btn btn-sm btn-warning"
+                                    title="Detalhes">
+                                    <i class='bx bx-show'></i> Detalhes
+                                </a>
+                                <button 
+                                    type="button"
+                                    class="btn btn-sm btn-danger btn-excluir-saida"
+                                    data-id="{{ s.id }}"
+                                    data-tipo="{{ s.get_tipo_saida_display }}"
+                                    data-data="{{ s.data_saida|date:'d/m/Y H:i' }}"
+                                    title="Excluir">
+                                    <i class='bx bx-trash'></i> Excluir
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4">
+                            <i class='bx bx-inbox'></i> Nenhuma saída
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Paginação -->
+    {% if is_paginated %}
+    <nav aria-label="Paginação de saídas" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1" title="Primeira página">
+                        <i class='bx bx-chevrons-left'></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" title="Página anterior">
+                        <i class='bx bx-chevron-left'></i>
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link"><i class='bx bx-chevrons-left'></i></span>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link"><i class='bx bx-chevron-left'></i></span>
+                </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">
+                            {{ num }}
+                            <span class="visually-hidden">(página atual)</span>
+                        </span>
+                    </li>
+                {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                {% endif %}
             {% endfor %}
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" title="Próxima página">
+                        <i class='bx bx-chevron-right'></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" title="Última página">
+                        <i class='bx bx-chevrons-right'></i>
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link"><i class='bx bx-chevron-right'></i></span>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link"><i class='bx bx-chevrons-right'></i></span>
+                </li>
+            {% endif %}
         </ul>
+    </nav>
+    {% endif %}
+</div>
+
+<!-- Modal Excluir Saída -->
+<div class="modal fade" id="modalExcluirSaida" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-danger">
+            <div class="modal-header bg-danger text-white d-flex justify-content-center">
+                <h5 class="modal-title">Excluir Saída</h5>
+            </div>
+            <div class="modal-body">
+                <p>
+                    Tem certeza que deseja excluir a saída: <br>
+                    <strong>ID: <span id="saidaId"></span></strong><br>
+                    <strong>Tipo: <span id="saidaTipo"></span></strong><br>
+                    <strong>Data: <span id="saidaData"></span></strong>
+                </p>
+                <p class="text-danger mb-0">
+                    <strong>Esta ação não pode ser desfeita.</strong>
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button class="btn btn-danger" id="confirmarExclusaoSaida">Sim, excluir</button>
+            </div>
+        </div>
     </div>
 </div>
+
+<script>
+let saidaId = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    
+    if (searchInput) {
+        searchInput.addEventListener('keyup', function() {
+            const searchTerm = this.value.toLowerCase();
+            document.querySelectorAll('.saida-row').forEach(row => {
+                const id = row.getAttribute('data-id');
+                const tipo = row.getAttribute('data-tipo');
+                
+                if (id.includes(searchTerm) || tipo.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    // Modal excluir saída
+    document.querySelectorAll('.btn-excluir-saida').forEach(btn => {
+        btn.addEventListener('click', () => {
+            saidaId = btn.dataset.id;
+            document.getElementById('saidaId').innerText = btn.dataset.id;
+            document.getElementById('saidaTipo').innerText = btn.dataset.tipo;
+            document.getElementById('saidaData').innerText = btn.dataset.data;
+            new bootstrap.Modal(document.getElementById('modalExcluirSaida')).show();
+        });
+    });
+
+    const btnConfirmarExclusao = document.getElementById('confirmarExclusaoSaida');
+    if (btnConfirmarExclusao) {
+        btnConfirmarExclusao.addEventListener('click', () => {
+            console.log('Deletando saída:', saidaId);
+            fetch(`/movimentacoes/saidas/${saidaId}/deletar/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(res => {
+                console.log('Response status:', res.status);
+                return res.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Erro ao excluir: ' + (data.message || 'Erro desconhecido'));
+                }
+            })
+            .catch(err => {
+                console.error('Erro:', err);
+                alert('Erro ao excluir saída');
+            });
+        });
+    }
+});
+</script>
+
 {% endblock %}

@@ -1,20 +1,203 @@
 {% extends 'base.html' %}
 
-{% block title %}Perfil{% endblock %}
+{% block title %}Perfil de {{ usuario.nome }}{% endblock %}
 
 {% block content %}
-<div class="container p-4">
+<div class="container-fluid p-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 mb-0">
+                <i class="bx bx-user-circle"></i> Perfil
+            </h1>
+        </div>
+    </div>
+
     <div class="row">
-        <div class="col-md-8">
-            <h2>Perfil</h2>
-            <div class="card mt-3">
-                <div class="card-body">
-                    <p><strong>Nome:</strong> {{ user.nome }}</p>
-                    <p><strong>Login:</strong> {{ user.login }}</p>
-                    <p><strong>Função:</strong> {{ user.get_nivel_acesso_display }}</p>
+        <div class="col-lg-8">
+            <!-- Card Principal de Perfil -->
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
+                <div class="card-header bg-primary text-white border-0 rounded-top-3 py-4">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-white bg-opacity-10 rounded-circle p-3" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; background: #0b1224; border: 1px solid rgba(255,255,255,0.08);" id="avatarContainer" title="Clique para mudar o avatar">
+                            {% if usuario.avatar == 'mulher' %}
+                                <svg width="56" height="56" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                    <circle cx="32" cy="32" r="30" fill="#fff0f6" stroke="#ff4fa8" stroke-width="2" />
+                                    <circle cx="32" cy="26" r="12" fill="#ff6fa8" stroke="#ffe6f4" stroke-width="2" />
+                                    <path d="M14 51c3-9 11-14 18-14s15 5 18 14" fill="#ffe6f4" stroke="#ff4fa8" stroke-width="2" stroke-linecap="round" />
+                                </svg>
+                            {% else %}
+                                <svg width="56" height="56" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                    <circle cx="32" cy="32" r="30" fill="#e8f1ff" stroke="#1e61ff" stroke-width="2" />
+                                    <circle cx="32" cy="26" r="12" fill="#1e61ff" stroke="#e8f1ff" stroke-width="2" />
+                                    <path d="M14 51c3-9 11-14 18-14s15 5 18 14" fill="#e8f1ff" stroke="#1e61ff" stroke-width="2" stroke-linecap="round" />
+                                </svg>
+                            {% endif %}
+                            <small style="position: absolute; bottom: 5px; right: 5px; font-size: 0.8rem; background: rgba(0,0,0,0.3); padding: 3px 6px; border-radius: 50%; color: white;">✎</small>
+                        </div>
+                        <div class="ms-3">
+                            <h3 class="mb-1">{{ usuario.nome }}</h3>
+                            <small class="text-white text-opacity-75">{{ usuario.get_nivel_acesso_display }}</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Informações Básicas -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div style="border-left: 4px solid #0d6efd; padding-left: 15px;">
+                                <h6 class="text-muted text-uppercase mb-2" style="font-size: 0.85rem;">
+                                    <i class="bx bx-user"></i> Login
+                                </h6>
+                                <p class="mb-0 fw-bold">{{ usuario.login }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div style="border-left: 4px solid #198754; padding-left: 15px;">
+                                <h6 class="text-muted text-uppercase mb-2" style="font-size: 0.85rem;">
+                                    <i class="bx bx-shield"></i> Função
+                                </h6>
+                                <p class="mb-0 fw-bold">
+                                    {% if usuario.nivel_acesso == 'admin' %}
+                                        <span class="badge bg-danger">Administrador</span>
+                                    {% elif usuario.nivel_acesso == 'estoquista' %}
+                                        <span class="badge bg-warning">Estoquista</span>
+                                    {% else %}
+                                        <span class="badge bg-info">Caixa</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <!-- Resumo de Status -->
+                    <div class="alert alert-info alert-dismissible fade show border-0 rounded-2" role="alert">
+                        <i class="bx bx-info-circle"></i>
+                        <strong>Status:</strong>
+                        {% if not usuario.is_active %}
+                            <span class="badge bg-danger ms-2">Desativado</span>
+                        {% else %}
+                            <span class="badge bg-success ms-2">Ativo</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+        <!-- Sidebar de Informações Adicionais -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-header bg-light border-0 rounded-top-3">
+                    <h5 class="mb-0">
+                        <i class="bx bx-info-circle"></i> Informações
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-3">
+                        <h6 class="text-muted text-uppercase mb-2" style="font-size: 0.85rem;">
+                            <i class="bx bx-shield-check"></i> Permissões
+                        </h6>
+                        <div>
+                            {% if usuario.is_superuser %}
+                                <span class="badge bg-danger me-2 mb-2">Acesso Total</span>
+                            {% else %}
+                                <span class="badge bg-warning me-2 mb-2">Acesso Limitado</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <hr>
+                    <div>
+                        <h6 class="text-muted text-uppercase mb-2" style="font-size: 0.85rem;">
+                            <i class="bx bx-calendar"></i> Membro Desde
+                        </h6>
+                        <p class="mb-0">{{ usuario.data_criacao|date:"d/m/Y" }}</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Modal de Seleção de Avatar -->
+<div class="modal fade" id="modalSelecionarAvatar" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 rounded-3 shadow-lg">
+      <div class="modal-header bg-primary text-white border-0 rounded-top justify-content-center">
+        <h5 class="modal-title">Escolher Avatar</h5>
+      </div>
+      <div class="modal-body p-5">
+        <div class="row g-4">
+                    <div class="col-6">
+                        <button type="button" class="btn avatar-option" data-avatar="homem" style="width: 100%; padding: 40px 20px; border: 3px solid #0d6efd; background: linear-gradient(135deg, #e7f5ff, #f0f8ff); border-radius: 15px;">
+                            <div style="margin-bottom: 15px;">
+                            <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <circle cx="32" cy="32" r="30" fill="#e8f1ff" stroke="#1e61ff" stroke-width="2" />
+                                <circle cx="32" cy="26" r="12" fill="#1e61ff" stroke="#e8f1ff" stroke-width="2" />
+                                <path d="M13 51c3.5-10 12-15 19-15s15.5 5 19 15" fill="#e8f1ff" stroke="#1e61ff" stroke-width="2" stroke-linecap="round" />
+                            </svg>
+                            </div>
+                            <small class="d-block fw-bold" style="color: #0d6efd;">Homem</small>
+                        </button>
+                    </div>
+                    <div class="col-6">
+                        <button type="button" class="btn avatar-option" data-avatar="mulher" style="width: 100%; padding: 40px 20px; border: 3px solid #ff69b4; background: linear-gradient(135deg, #ffe5f0, #fff0f6); border-radius: 15px;">
+                            <div style="margin-bottom: 15px;">
+                            <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <circle cx="32" cy="32" r="30" fill="#fff0f6" stroke="#ff4fa8" stroke-width="2" />
+                                <circle cx="32" cy="26" r="12" fill="#ff6fa8" stroke="#ffe6f4" stroke-width="2" />
+                                <path d="M13 51c3.5-10 12-15 19-15s15.5 5 19 15" fill="#ffe6f4" stroke="#ff4fa8" stroke-width="2" stroke-linecap="round" />
+                            </svg>
+                            </div>
+                            <small class="d-block fw-bold" style="color: #ff69b4;">Mulher</small>
+                        </button>
+                    </div>
+        </div>
+      </div>
+      <div class="modal-footer border-0 justify-content-center">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Modal de avatar: abre ao clicar e salva a escolha via POST com CSRF
+document.addEventListener('DOMContentLoaded', function() {
+    const avatarContainer = document.getElementById('avatarContainer');
+    const modal = new bootstrap.Modal(document.getElementById('modalSelecionarAvatar'));
+    
+    // Abrir modal ao clicar no avatar
+    if (avatarContainer) {
+        avatarContainer.addEventListener('click', function() {
+            modal.show();
+        });
+    }
+    
+    // Selecionar avatar
+    document.querySelectorAll('.avatar-option').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const avatar = this.dataset.avatar;
+            const usuarioId = {{ usuario.id }};
+            
+            fetch(`/usuarios/${usuarioId}/avatar/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `avatar=${avatar}`
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                }
+            });
+        });
+    });
+});
+</script>
 {% endblock %}

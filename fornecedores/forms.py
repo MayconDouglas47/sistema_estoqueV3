@@ -5,7 +5,8 @@ from .models import Fornecedor
 class FornecedorForm(forms.ModelForm):
     class Meta:
         model = Fornecedor
-        fields = ['nome', 'cnpj', 'email', 'telefone', 'endereco']
+        fields = ['nome', 'cnpj', 'email', 'telefone', 'rua',
+                  'numero', 'bairro', 'cidade', 'estado', 'cep']
         widgets = {
             'nome': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -13,7 +14,8 @@ class FornecedorForm(forms.ModelForm):
             }),
             'cnpj': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'CNPJ (opcional)'
+                'placeholder': '00.000.000/0001-00',
+                'autocomplete': 'off'
             }),
             'email': forms.EmailInput(attrs={
                 'class': 'form-control',
@@ -21,11 +23,32 @@ class FornecedorForm(forms.ModelForm):
             }),
             'telefone': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Telefone (opcional)'
+                'placeholder': '(00) 90000-0000',
+                'autocomplete': 'off'
             }),
-            'endereco': forms.Textarea(attrs={
+            'rua': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Endereço (opcional)',
-                'rows': 3
+                'placeholder': 'Rua (opcional)'
+            }),
+            'numero': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Número (opcional)',
+                'maxlength': '20'
+            }),
+            'bairro': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Bairro (opcional)'
+            }),
+            'cidade': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Cidade (opcional)'
+            }),
+            'estado': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'cep': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'CEP (opcional)',
+                'maxlength': '9'
             }),
         }
