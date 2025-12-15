@@ -1,49 +1,63 @@
-EM DESENVOLVIMENTO E CORREÇÕES DE ERROS
-  
-Sistema de Estoque
+📦 Sistema de Estooque
 
-Aplicação Django para gerenciamento de estoque (produtos, fornecedores, marcas e movimentações de entrada/saída).
+🚧 Em desenvolvimento e correções de erros
 
-Funcionalidades
-Autenticação de usuários com 3 níveis de acesso:
+Aplicação Django para gerenciamento de estoque, permitindo o controle de produtos, fornecedores, marcas e movimentações de entrada e saída.
+
+🚀 Funcionalidades
+🔐 Autenticação de Usuários
+
+Sistema de login com 3 níveis de acesso:
 
 Admin
+
 Estoquista
+
 Caixa
 
-CRUD de:
+🗂️ Cadastro (CRUD)
+
 Categorias
+
 Marcas
+
 Fornecedores
+
 Produtos
-Movimentações:
-Entrada e Saída de produtos
-Atualização automática do estoque
-Dashboard com KPIs e alertas de estoque baixo
-Relatórios:
+
+🔄 Movimentações de Estoque
+
+Entrada de produtos
+
+Saída de produtos
+
+Atualização automática do saldo em estoque
+
+📊 Dashboard
+
+KPIs de estoque
+
+Alertas de estoque baixo
+
+📄 Relatórios
+
 Relatório de estoque atual
+
 Histórico de movimentações
 
-  Como rodar o projeto (Windows)
-
-1. Criar e ativar o ambiente virtual
-   
-    python -m venv venv
-
+⚙️ Como rodar o projeto (Windows)
+1️⃣ Criar e ativar o ambiente virtual
+python -m venv venv
 .\venv\Scripts\activate
 
-2. Instalar dependências
-   
-    pip install -r requirements.txt
+2️⃣ Instalar as dependências
+pip install -r requirements.txt
 
-4. aplicar migrações
-   
-    python manage.py migrate
+3️⃣ Aplicar as migrações
+python manage.py migrate
 
-6. Rodar o servidor
-   
-    python manage.py runserver
+4️⃣ Rodar o servidor
+python manage.py runserver
 
-Acesse:
-
-    http://127.0.0.1:8000/
+🌐 Acesso ao sistema
+http://127.0.0.1:8000/
