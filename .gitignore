@@ -5,10 +5,6 @@ __pycache__/
 # Django
 db.sqlite3
 
-# Ambiente virtual
-.env
-.venv
+# Virtualenv
 venv/
-
-# Sistema
-.DS_Store
+.env
