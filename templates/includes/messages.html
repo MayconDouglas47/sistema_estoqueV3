@@ -1,0 +1,11 @@
+{% if messages %}
+<div class="d-flex justify-content-center w-100 position-fixed top-0 p-3" style="z-index: 1080;">
+    <div style="margin-top: 70px; transform: translateX(80px);">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show auto-dismiss d-inline-block" role="alert">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
