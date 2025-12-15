@@ -1,4 +1,4 @@
-- Em desenvolvimento e correções 
+EM DESENVOLVIMENTO E CORREÇÕES DE ERROS
   
 Sistema de Estoque
 
@@ -32,12 +32,13 @@ python -m venv venv
 .\venv\Scripts\activate
 
 2. Instalar dependências
+   
 pip install -r requirements.txt
 
-3. aplicar migrações
+4. aplicar migrações
 python manage.py migrate
 
-4. Rodar o servidor
+5. Rodar o servidor
 python manage.py runserver
 
 Acesse:
