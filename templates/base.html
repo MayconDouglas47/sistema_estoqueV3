@@ -1,38 +1,86 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+
+    <!-- Garante responsividade correta em todos os dispositivos -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Título dinâmico por página -->
     <title>{% block title %}Sistema{% endblock %}</title>
 
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <!-- Bootstrap 5 (CSS) -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+    >
 
-    <!-- Boxicons -->
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <!-- Boxicons (ícones) -->
+    <link
+        href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+        rel="stylesheet"
+    >
 
-    <!-- CSS -->
+    <!-- CSS principal do sistema -->
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
+
 <body>
 
-<div id="sidebar">
-    {% include 'includes/sidebar.html' %}
-</div>
+    <!-- ============================= -->
+    <!-- MENSAGENS DO SISTEMA (GLOBAL) -->
+    <!-- ============================= -->
+    <!--
+        Este include é RESPONSÁVEL por:
+        - Renderizar todas as mensagens do Django (success, error, info, warning)
+        - Consumir as mensagens na mesma requisição
+        - Evitar vazamento entre apps e usuários
+        - Centralizar feedback visual do sistema
+    -->
+    {% include 'includes/messages.html' %}
 
-<div id="content-wrapper">
-    {% include 'includes/header.html' %}
+    <!-- ============================= -->
+    <!-- SIDEBAR -->
+    <!-- ============================= -->
+    <div id="sidebar">
+        {% include 'includes/sidebar.html' %}
+    </div>
 
-    <main class="container-fluid p-4">
-        {% block content %}
-        {% endblock %}
-    </main>
-</div>
+    <!-- ============================= -->
+    <!-- CONTEÚDO PRINCIPAL -->
+    <!-- ============================= -->
+    <div id="content-wrapper">
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="{% static 'js/main.js' %}"></script>
+        <!-- Header / Navbar -->
+        {% include 'includes/header.html' %}
+
+        <!-- Conteúdo específico de cada página -->
+        <main class="container-fluid p-4">
+            {% block content %}
+            {% endblock %}
+        </main>
+
+    </div>
+
+    <!-- ============================= -->
+    <!-- SCRIPTS -->
+    <!-- ============================= -->
+
+    <!-- Bootstrap 5 (JS bundle com Popper) -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js">
+    </script>
+
+    <!-- JS principal do sistema (sidebar, navegação etc.) -->
+    <script src="{% static 'js/main.js' %}"></script>
+
+    <!-- JS responsável pelo auto-dismiss das mensagens -->
+    <!--
+        Fecha automaticamente alerts após alguns segundos,
+        melhorando a experiência do usuário.
+    -->
+    <script src="{% static 'js/messages.js' %}"></script>
 
 </body>
 </html>

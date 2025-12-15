@@ -18,7 +18,7 @@
                     <p><strong>Login:</strong> {{ usuario.login }}</p>
                 </div>
                 <div class="col-md-6">
-                    <p><strong>Role:</strong> {{ usuario.get_nivel_acesso_display }}</p>
+                    <p><strong>Nível de Acesso:</strong> {{ usuario.get_nivel_acesso_display }}</p>
                     <p><strong>Status:</strong> 
                         {% if usuario.is_active %}
                             <span class="badge bg-success">Ativo</span>
@@ -31,7 +31,7 @@
 
             <div class="mt-4">
                 <a href="{% url 'usuarios:editar' usuario.id %}" class="btn btn-warning">Editar</a>
-                <a href="{% url 'usuarios:deletar' usuario.id %}" class="btn btn-danger">Deletar</a>
+                <a href="{% url 'usuarios:deletar' usuario.id %}" class="btn btn-danger">Excluir</a>
                 <a href="{% url 'usuarios:index' %}" class="btn btn-secondary">Voltar</a>
             </div>
         </div>

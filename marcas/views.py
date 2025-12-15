@@ -1,6 +1,8 @@
+# marca/views.py (MODIFICADO)
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.http import JsonResponse # IMPORTAÇÃO ADICIONADA
 from .models import Marca
 from .forms import MarcaForm
 
@@ -41,8 +43,19 @@ def editar(request, pk):
 @login_required
 def deletar(request, pk):
     marca = get_object_or_404(Marca, pk=pk)
+    
+    # Se a requisição for POST (vindo do modal de confirmação)
     if request.method == 'POST':
-        marca.delete()
-        messages.success(request, 'Marca deletada com sucesso!')
-        return redirect('marcas:index')
-    return render(request, 'marcas/deletar_marca.html', {'marca': marca})
+        try:
+            marca.delete()
+            messages.success(request, 'Marca excluída com sucesso!')
+            
+            # Resposta para o JavaScript (Fetch)
+            return JsonResponse({'success': True}) 
+        except Exception as e:
+            # Em caso de erro (ex: chave estrangeira, itens relacionados)
+            # Retornamos uma resposta JSON de falha
+            return JsonResponse({'success': False, 'error': str(e)}, status=400)
+            
+    # Se a requisição não for POST, retorne erro 405 (o template deletar_marca.html não é mais usado)
+    return JsonResponse({'success': False, 'error': 'Método não permitido.'}, status=405)

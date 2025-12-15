@@ -97,7 +97,7 @@ def deletar_usuario(request, id):
     usuario = get_object_or_404(Usuario, id=id)
     if request.method == 'POST':
         usuario.delete()
-        messages.success(request, 'Usuário deletado com sucesso!')
+        messages.success(request, 'Usuário excluído com sucesso!')
         return redirect('usuarios:index')
     return render(request, 'usuarios/deletar.html', {'usuario': usuario})
 

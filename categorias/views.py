@@ -1,6 +1,8 @@
+# categoria/views.py (MODIFICADO)
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.http import JsonResponse # IMPORTAÇÃO ADICIONADA
 from .models import Categoria
 from .forms import CategoriaForm
 
@@ -41,8 +43,18 @@ def editar(request, pk):
 @login_required
 def deletar(request, pk):
     categoria = get_object_or_404(Categoria, pk=pk)
+    
+    # Se a requisição for POST (vindo do modal de confirmação)
     if request.method == 'POST':
-        categoria.delete()
-        messages.success(request, 'Categoria deletada com sucesso!')
-        return redirect('categorias:index')
-    return render(request, 'categorias/deletar_categoria.html', {'categoria': categoria})
+        try:
+            categoria.delete()
+            messages.success(request, 'Categoria excluída com sucesso!')
+            
+            # Resposta para o JavaScript (Fetch)
+            return JsonResponse({'success': True}) 
+        except Exception as e:
+            # Em caso de erro (ex: chave estrangeira, itens relacionados)
+            return JsonResponse({'success': False, 'error': str(e)}, status=400)
+            
+    # Se a requisição não for POST, retorne erro 405 (o template deletar_categoria.html não é mais usado)
+    return JsonResponse({'success': False, 'error': 'Método não permitido.'}, status=405)

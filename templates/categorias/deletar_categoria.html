@@ -1,3 +1,4 @@
+Arquivo não utilizado atualmente
 {% extends 'base.html' %}
 
 {% block title %}Deletar Categoria{% endblock %}
@@ -7,7 +8,7 @@
     <div class="col-md-6">
         <div class="alert alert-danger" role="alert">
             <h4 class="alert-heading">Confirmar exclusão</h4>
-            <p>Tem certeza que deseja deletar a categoria <strong>{{ categoria.nome }}</strong>?</p>
+            <p>Tem certeza que deseja excluir a categoria <strong>{{ categoria.nome }}</strong>?</p>
             <hr>
             <p class="mb-0">Esta ação não pode ser desfeita!</p>
         </div>
@@ -15,7 +16,7 @@
         <form method="post" class="d-inline">
             {% csrf_token %}
             <button type="submit" class="btn btn-danger">
-                <i class='bx bx-trash'></i> Deletar
+                <i class='bx bx-trash'></i> Excluir
             </button>
             <a href="{% url 'categorias:index' %}" class="btn btn-secondary">
                 <i class='bx bx-x'></i> Cancelar

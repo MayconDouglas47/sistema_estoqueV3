@@ -43,9 +43,13 @@
                             <a href="{% url 'marcas:editar' marca.id %}" class="btn btn-sm btn-warning">
                                 <i class='bx bx-edit'></i> Editar
                             </a>
-                            <a href="{% url 'marcas:deletar' marca.id %}" class="btn btn-sm btn-danger">
-                                <i class='bx bx-trash'></i> Deletar
-                            </a>
+                            <button 
+                                type="button"
+                                class="btn btn-sm btn-danger btn-excluir-marca" 
+                                data-id="{{ marca.id }}"
+                                data-nome="{{ marca.nome }}">
+                                <i class='bx bx-trash'></i> Excluir
+                            </button>
                         </td>
                     </tr>
                     {% empty %}
@@ -60,4 +64,95 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="modalConfirmacaoExclusao" tabindex="-1" aria-labelledby="modalConfirmacaoExclusaoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-danger">
+            <div class="modal-header bg-danger text-white d-flex justify-content-center">
+                <h5 class="modal-title" id="modalConfirmacaoExclusaoLabel">Excluir Marca</h5>
+            </div>
+            
+            <div class="modal-body">
+                <p>
+                    Tem certeza que deseja excluir a marca: <br>
+                    <strong id="itemParaExcluirNome"></strong>?
+                </p>
+                
+                <p class="text-danger mb-0">
+                    <strong>Esta ação não pode ser desfeita.</strong>
+                </p>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button class="btn btn-danger" id="btnConfirmarExclusao">Sim, Excluir</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let itemIdParaExcluir = null;
+    const modalElement = document.getElementById('modalConfirmacaoExclusao');
+    
+    if (!modalElement) {
+        console.error("Erro: O elemento modalConfirmacaoExclusao não foi encontrado no DOM.");
+        return; 
+    }
+
+    const modalExclusao = new bootstrap.Modal(modalElement);
+    const nomeItemDisplay = document.getElementById('itemParaExcluirNome');
+    const btnConfirmar = document.getElementById('btnConfirmarExclusao');
+
+    // 1. Configura o clique em CADA botão de exclusão na tabela
+    document.querySelectorAll('.btn-excluir-marca').forEach(btn => { // Seletor Alterado para .btn-excluir-marca
+        btn.addEventListener('click', function() {
+            itemIdParaExcluir = this.dataset.id;
+            const nomeItem = this.dataset.nome; 
+            
+            if (nomeItemDisplay) {
+                 nomeItemDisplay.innerText = nomeItem;
+            }
+           
+            // Abre o modal
+            modalExclusao.show();
+        });
+    });
+
+    // 2. Configura o clique no botão "Sim, Excluir" do modal
+    if (btnConfirmar) {
+        btnConfirmar.addEventListener('click', function() {
+            
+            // URL: Ajustado para a rota 'marcas:deletar'
+            const urlExclusao = `{% url "marcas:deletar" 0 %}`.replace('0', itemIdParaExcluir); 
+            
+            modalExclusao.hide();
+
+            // Envia a requisição Fetch/AJAX para a View (views.py)
+            fetch(urlExclusao, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) { 
+                     // Se a exclusão no backend foi sucesso, recarrega a página 
+                     window.location.href = '{% url "marcas:index" %}';
+                } else {
+                     alert('Erro ao excluir: ' + (data.error || 'Ocorreu um erro no servidor.'));
+                }
+            })
+            .catch(error => {
+                console.error('Erro na requisição:', error);
+                alert('Ocorreu um erro de comunicação com o servidor.');
+            });
+        });
+    }
+});
+</script>
+
 {% endblock %}

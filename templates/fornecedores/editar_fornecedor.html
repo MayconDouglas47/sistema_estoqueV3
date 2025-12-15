@@ -9,10 +9,10 @@
         <div class="col-md-8 offset-md-2">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="mb-0">Editar Fornecedor</h5>
+                    <h5 class="mb-0">Editar Fornecedor: {{ fornecedor.nome }}</h5>
                 </div>
                 <div class="card-body">
-                    <form method="post">
+                    <form method="post" id="form-fornecedor">
                         {% csrf_token %}
                         {{ form|crispy }}
                         <div class="d-grid gap-2 d-sm-flex justify-content-sm-end">
@@ -29,4 +29,86 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('form-fornecedor'); 
+        
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                // Intercepta a submissão padrão do formulário
+                e.preventDefault(); 
+                
+                const formData = new FormData(form);
+                clearFormErrors(form); // Limpa erros anteriores
+                
+                // Exemplo de como obter a URL de redirecionamento para sucesso
+                const redirectUrl = '{% url "fornecedores:index" %}';
+
+                // Envia a requisição via fetch (AJAX)
+                fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        // Header crucial para que a view saiba que é AJAX e retorne JSON
+                        'X-Requested-With': 'XMLHttpRequest', 
+                    },
+                    body: formData,
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    // Se houver erro de validação (status 400), trata o JSON de erro
+                    return response.json().then(data => { throw data; });
+                })
+                .then(data => {
+                    // Trata o sucesso
+                    if (data.success) {
+                        alert(data.message || 'Operação realizada com sucesso!');
+                        window.location.href = redirectUrl; 
+                    }
+                })
+                .catch(error => {
+                    // Trata o erro (geralmente erros de validação retornados pelo Django)
+                    if (error.errors) {
+                        displayFormErrors(form, error.errors);
+                    } else {
+                        alert("Ocorreu um erro inesperado: " + (error.message || 'Erro de conexão.'));
+                    }
+                });
+            });
+        }
+
+        // Funções Auxiliares (Para exibir e limpar os erros de validação do Django)
+        function clearFormErrors(form) {
+            form.querySelectorAll('.error-message').forEach(el => el.remove());
+            form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+        }
+        
+        function displayFormErrors(form, errors) {
+            for (const fieldName in errors) {
+                // Assume que você está usando crispy-forms ou Bootstrap
+                const fieldContainer = form.querySelector(`#div_id_${fieldName}`);
+                if (fieldContainer) {
+                    // Limpa erros anteriores do campo
+                    fieldContainer.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
+                    
+                    const errorElement = document.createElement('div');
+                    errorElement.className = 'invalid-feedback d-block error-message';
+                    errorElement.textContent = errors[fieldName].join(' '); 
+                    
+                    fieldContainer.appendChild(errorElement);
+                    
+                    // Adiciona a classe de erro ao input principal
+                    const inputField = fieldContainer.querySelector(`[name="${fieldName}"]`);
+                    if (inputField) {
+                        inputField.classList.add('is-invalid');
+                    }
+                }
+            }
+        }
+    });
+</script>
 {% endblock %}

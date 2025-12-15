@@ -27,7 +27,7 @@
                                 <small class="d-block text-muted">Fornecedor: {{ e.fornecedor.nome|default:"-" }}</small>
                             </div>
                             <div>
-                                <a href="{% url 'movimentacoes:deletar_entrada' e.id %}" class="btn btn-sm btn-danger">Deletar</a>
+                                <a href="{% url 'movimentacoes:deletar_entrada' e.id %}" class="btn btn-sm btn-danger">Excluir</a>
                             </div>
                         </li>
                     {% empty %}
@@ -47,7 +47,7 @@
                                 <small class="d-block">{{ s.data_saida }}</small>
                             </div>
                             <div>
-                                <a href="{% url 'movimentacoes:deletar_saida' s.id %}" class="btn btn-sm btn-danger">Deletar</a>
+                                <a href="{% url 'movimentacoes:deletar_saida' s.id %}" class="btn btn-sm btn-danger">Excluir</a>
                             </div>
                         </li>
                     {% empty %}

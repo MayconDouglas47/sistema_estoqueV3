@@ -93,7 +93,7 @@ def deletar_entrada(request, pk):
     entrada = get_object_or_404(EntradaEstoque, pk=pk)
     if request.method == 'POST':
         entrada.delete()
-        messages.success(request, 'Entrada deletada com sucesso!')
+        messages.success(request, 'Entrada excluída com sucesso!')
         return redirect('movimentacoes:index')
     return render(request, 'movimentacoes/deletar_entrada.html', {'entrada': entrada})
 
@@ -103,7 +103,7 @@ def deletar_saida(request, pk):
     saida = get_object_or_404(SaidaEstoque, pk=pk)
     if request.method == 'POST':
         saida.delete()
-        messages.success(request, 'Saída deletada com sucesso!')
+        messages.success(request, 'Saída excluída com sucesso!')
         return redirect('movimentacoes:index')
     return render(request, 'movimentacoes/deletar_saida.html', {'saida': saida})
 

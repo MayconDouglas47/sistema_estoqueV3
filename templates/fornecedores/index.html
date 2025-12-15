@@ -17,9 +17,8 @@
 
     {% if messages %}
         {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            <div class="alert alert-{{ message.tags }} fade show">
                 {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         {% endfor %}
     {% endif %}
@@ -46,12 +45,19 @@
                         <td>{{ fornecedor.email|default:"-" }}</td>
                         <td>{{ fornecedor.telefone|default:"-" }}</td>
                         <td>
-                            <a href="{% url 'fornecedores:editar' fornecedor.id %}" class="btn btn-sm btn-warning">
+                            <a href="{% url 'fornecedores:editar' fornecedor.id %}"
+                               class="btn btn-sm btn-warning">
                                 <i class='bx bx-edit'></i> Editar
                             </a>
-                            <a href="{% url 'fornecedores:deletar' fornecedor.id %}" class="btn btn-sm btn-danger">
-                                <i class='bx bx-trash'></i> Deletar
-                            </a>
+
+                            {% if request.user.is_superuser %}
+                            <button
+                                class="btn btn-sm btn-danger btn-excluir-fornecedor"
+                                data-id="{{ fornecedor.id }}"
+                                data-nome="{{ fornecedor.nome }}">
+                                <i class='bx bx-trash'></i> Excluir
+                            </button>
+                            {% endif %}
                         </td>
                     </tr>
                     {% empty %}
@@ -66,4 +72,86 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="modalAvisoFornecedor" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-warning">
+      <div class="modal-header bg-warning text-dark d-flex justify-content-center"> 
+        <h5 class="modal-title">AVISO</h5>
+      </div>
+      <div class="modal-body text-center">
+        Não é possível excluir este fornecedor pois existem produtos associados a ele.
+      </div>
+      <div class="modal-footer justify-content-center">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Voltar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modalExcluirFornecedor" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-danger">
+      <div class="modal-header bg-danger text-white d-flex justify-content-center">
+        <h5 class="modal-title">Excluir Fornecedor</h5>
+      </div>
+      <div class="modal-body">
+        <p>
+            Tem certeza que deseja excluir o fornecedor: <br>
+            <strong id="nomeFornecedor"></strong>?
+        </p>
+        <p class="text-danger mb-0">
+            <strong>Esta ação não pode ser desfeita.</strong>
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn btn-danger" id="confirmarExclusaoFornecedor">Sim, excluir</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let fornecedorId = null;
+
+document.querySelectorAll('.btn-excluir-fornecedor').forEach(btn => {
+    btn.addEventListener('click', () => {
+        fornecedorId = btn.dataset.id;
+        const nome = btn.dataset.nome;
+
+        fetch(`/fornecedores/${fornecedorId}/deletar/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'X-Check-Only': 'true'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.can_delete) {
+                document.getElementById('nomeFornecedor').innerText = nome;
+                new bootstrap.Modal(
+                    document.getElementById('modalExcluirFornecedor')
+                ).show();
+            } else {
+                new bootstrap.Modal(
+                    document.getElementById('modalAvisoFornecedor')
+                ).show();
+            }
+        });
+    });
+});
+
+document.getElementById('confirmarExclusaoFornecedor').addEventListener('click', () => {
+    fetch(`/fornecedores/${fornecedorId}/deletar/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+        }
+    })
+    .then(res => res.json())
+    .then(() => location.reload());
+});
+</script>
 {% endblock %}
