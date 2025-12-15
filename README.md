@@ -27,19 +27,23 @@ Histórico de movimentações
 Como rodar o projeto (Windows)
 
 1. Criar e ativar o ambiente virtual
-python -m venv venv
+   
+  python -m venv venv
 
 .\venv\Scripts\activate
 
 2. Instalar dependências
    
-pip install -r requirements.txt
+  pip install -r requirements.txt
 
 4. aplicar migrações
-python manage.py migrate
+   
+  python manage.py migrate
 
-5. Rodar o servidor
-python manage.py runserver
+6. Rodar o servidor
+   
+  python manage.py runserver
 
 Acesse:
-http://127.0.0.1:8000/
+
+  http://127.0.0.1:8000/
